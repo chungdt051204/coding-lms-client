@@ -358,7 +358,10 @@ const CourseEditor = () => {
                       <option value="">Chọn danh mục</option>
                       {categories?.map((value) => {
                         return (
-                          <option key={value._id} value={value?.item?._id}>
+                          <option
+                            key={value?.item?._id}
+                            value={value?.item?._id}
+                          >
                             {value?.item?.category_name}
                           </option>
                         );
