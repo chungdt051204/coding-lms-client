@@ -33,7 +33,7 @@ import { cartService } from "./services/cartService";
 import { setCart } from "./stores/features/cartSlice";
 import Cart from "./pages/user/Cart";
 
-export const api = "http://localhost:3000";
+export const api = "https://lms-server-2xk1.onrender.com";
 function App() {
   const isLogin = useSelector((state) => state.auth.isLogin);
   const me = useSelector((state) => state.me.item);
