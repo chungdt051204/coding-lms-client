@@ -7,6 +7,7 @@ import { courseSlice } from "./features/courseSlice";
 import { enrollmentSlice } from "./features/enrollmentSlice";
 import { testSlice } from "./features/testSlice";
 import { cartSlice } from "./features/cartSlice";
+import { notificationSlice } from "./features/notificationSlice";
 export const store = configureStore({
   reducer: {
     auth: authSlice.reducer,
@@ -17,5 +18,6 @@ export const store = configureStore({
     enrollments: enrollmentSlice.reducer,
     tests: testSlice.reducer,
     cart: cartSlice.reducer,
+    notifications: notificationSlice.reducer,
   },
 });

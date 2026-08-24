@@ -95,7 +95,9 @@ const TestEditor = () => {
   useEffect(() => {
     const getCoursesByInstructor = async () => {
       try {
-        const result = await courseService.getCoursesByInstructor();
+        const result = await courseService.getCoursesByInstructor({
+          params: "",
+        });
         console.log(result);
         dispatch(setCourses(result.data));
       } catch (error) {
@@ -108,17 +110,32 @@ const TestEditor = () => {
   }, [dispatch]);
   const handleSave = async (e) => {
     e.preventDefault();
+    const testNameRegex = /^[\p{L}\p{N}\s&.+\-_()#/,"';:!?%*]+$/u;
     if (testInfo.testName === "") {
       setError((prev) => ({
         ...prev,
         errorTestName: "Vui lòng nhập tên bài kiểm tra!",
       }));
-      return;
+    } else if (!testNameRegex.test(testInfo.testName)) {
+      setError((prev) => ({
+        ...prev,
+        errorTestName: "Tên bài kiểm tra không được chứa ký tự đặc biệt!",
+      }));
     }
     if (testInfo.courseId === "") {
       setError((prev) => ({
         ...prev,
         errorCourse: "Vui lòng chọn khóa học!",
+      }));
+    } else if (
+      courses?.arrayCourse?.find(
+        (value) =>
+          value?.course?._id == testInfo.courseId && value?.numberTest == 1
+      )
+    ) {
+      setError((prev) => ({
+        ...prev,
+        errorCourse: "Khóa học này đã có bài kiểm tra!",
       }));
       return;
     } else {
@@ -152,6 +169,8 @@ const TestEditor = () => {
           const status = error.status;
           const message = error.data.message;
           console.log(status, message);
+          if (status === 409)
+            setError((prev) => ({ ...prev, errorCourse: message }));
         }
       }
     }
@@ -174,7 +193,6 @@ const TestEditor = () => {
       }
     } else {
       setQuestions(questions?.filter((_, idx) => idx !== index));
-      toast.success("Xóa câu hỏi thành công");
     }
   };
   return (
@@ -244,7 +262,7 @@ const TestEditor = () => {
                 value={testInfo.courseId}
               >
                 <option value="">Chọn khóa học</option>
-                {courses?.map((value) => {
+                {courses?.arrayCourse?.map((value) => {
                   return (
                     <option key={value.course._id} value={value.course._id}>
                       {value.course.course_name}
@@ -314,32 +332,10 @@ const TestEditor = () => {
             </div>
           </div>
           {/* Câu hỏi */}
-          <div className="flex justify-between mt-5">
+          <div className="mt-5">
             <p className="text-headline-md text-surface-nav font-medium">
               Câu hỏi ({questions.length})
             </p>
-            <button
-              type="button"
-              className="w-[20%] flex items-center gap-x-4 p-2 border border-surface-bg rounded-[8px] transition-transform duration-300 hover:bg-surface-bg hover:cursor-pointer"
-              onClick={() =>
-                setQuestions((prev) => [
-                  ...prev,
-                  {
-                    questionContent: "",
-                    options: [
-                      { answerContent: "", isCorrect: true },
-                      { answerContent: "", isCorrect: false },
-                      { answerContent: "", isCorrect: false },
-                      { answerContent: "", isCorrect: false },
-                    ],
-                    order: 0,
-                  },
-                ])
-              }
-            >
-              <FaPlus />
-              Thêm câu hỏi
-            </button>
           </div>
           <div className="flex flex-col gap-y-5 mt-5">
             {questions?.map((value, index) => {
@@ -417,6 +413,30 @@ const TestEditor = () => {
                 </div>
               );
             })}
+            <div className="flex justify-end px-5">
+              <button
+                type="button"
+                className="w-[18%] flex items-center gap-x-4 p-2 bg-surface-nav text-surface-white text-title-lg rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                onClick={() =>
+                  setQuestions((prev) => [
+                    ...prev,
+                    {
+                      questionContent: "",
+                      options: [
+                        { answerContent: "", isCorrect: true },
+                        { answerContent: "", isCorrect: false },
+                        { answerContent: "", isCorrect: false },
+                        { answerContent: "", isCorrect: false },
+                      ],
+                      order: 0,
+                    },
+                  ])
+                }
+              >
+                <FaPlus />
+                Thêm câu hỏi
+              </button>
+            </div>
           </div>
           <button
             type="submit"

@@ -8,16 +8,16 @@ export const courseService = {
     });
     return response;
   },
-  getApprovedCourses: async () => {
-    const response = await axiosClient.get("/courses");
+  getApprovedCourses: async ({ params }) => {
+    const response = await axiosClient.get(`/courses?${params}`);
     return response;
   },
-  getCoursesByInstructor: async () => {
-    const response = await axiosClient.get("/instructor/courses");
+  getCoursesByInstructor: async ({ params }) => {
+    const response = await axiosClient.get(`/instructor/courses?${params}`);
     return response;
   },
-  getCoursesByAdmin: async () => {
-    const response = await axiosClient.get("/admin/courses");
+  getCoursesByAdmin: async ({ params }) => {
+    const response = await axiosClient.get(`/admin/courses?${params}`);
     return response;
   },
   getCourseById: async ({ courseId }) => {
@@ -49,9 +49,10 @@ export const courseService = {
     );
     return response;
   },
-  approveOrRejectCourse: async ({ courseId, status }) => {
+  approveOrRejectCourse: async ({ courseId, status, data }) => {
     const response = await axiosClient.put(
-      `/admin/course/${courseId}/status?status=${status}`
+      `/admin/course/${courseId}/status?status=${status}`,
+      data
     );
     return response;
   },

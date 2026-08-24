@@ -11,9 +11,13 @@ import ReactPlayer from "react-player";
 import { FaCheck } from "react-icons/fa6";
 import { Navbar } from "../components/Navbar";
 import { toast } from "react-toastify";
+import Footer from "../components/Footer";
 const LessonDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { item: me, isLoading: loading } = useSelector((state) => state.me);
+  const isAdmin = me?.role_id?.role === "admin";
+  const isInstructor = me?.role_id?.role === "instructor";
   const { items: enrollments, isLoading } = useSelector(
     (state) => state.enrollments
   );
@@ -24,9 +28,15 @@ const LessonDetail = () => {
   const currentTime = Number(
     lessonProgresses.find((value) => value.lesson_id._id == id)?.current_time
   );
-  const enrolledCourse = enrollments?.find(
-    (value) => value.course_id == courseId
+  const enrolledCourse = enrollments?.arrayEnrollment?.find(
+    (value) => value?.item?.course_id?._id == courseId
   );
+  const numberAccessLesson =
+    enrolledCourse?.item?.access_level == "LIMITED"
+      ? (lessons?.length * 50) / 100
+      : enrolledCourse?.item?.access_level == "UNLIMITED"
+      ? lessons?.length
+      : 0;
   const playerRef = useRef();
   const secondToTime = (second) => {
     if (second < 60) return `00:${second}`;
@@ -38,38 +48,46 @@ const LessonDetail = () => {
       )}:${(second % 3600) % 60}`;
   };
   useEffect(() => {
-    console.log(enrolledCourse);
-    if (!enrolledCourse && !isLoading) {
+    console.log(numberAccessLesson);
+  }, [numberAccessLesson]);
+  useEffect(() => {
+    if (!enrolledCourse && !isLoading && !isAdmin && !isInstructor) {
       navigate("/");
       return;
     }
-  }, [enrolledCourse, navigate, isLoading]);
+  }, [enrolledCourse, navigate, isLoading, isAdmin, isInstructor]);
   useEffect(() => {
-    const getEnrollmentsByUser = async () => {
-      try {
-        const result = await enrollmentService.getEnrollmentsByUser();
-        console.log(result.data);
-        dispatch(setEnrollments(result.data));
-      } catch (error) {
-        const status = error.status;
-        const message = error.data.message;
-        console.log(status, message);
-      }
-    };
-    getEnrollmentsByUser();
-    const getLessonsByCourse = async () => {
-      try {
-        const result = await lessonService.getLessonsByCourse({ courseId });
-        console.log(result.data);
-        setLessons(result.data);
-      } catch (error) {
-        const status = error.status;
-        const message = error.data.message;
-        console.log(status, message);
-      }
-    };
-    getLessonsByCourse();
-  }, [courseId, dispatch]);
+    if (!loading && !isAdmin && !isInstructor) {
+      const getEnrollmentsByUser = async () => {
+        try {
+          const result = await enrollmentService.getEnrollmentsByUser({
+            params: {},
+          });
+          console.log(result.data);
+          dispatch(setEnrollments(result.data));
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
+      };
+      getEnrollmentsByUser();
+    }
+    if (courseId) {
+      const getLessonsByCourse = async () => {
+        try {
+          const result = await lessonService.getLessonsByCourse({ courseId });
+          console.log(result.data);
+          setLessons(result.data);
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
+      };
+      getLessonsByCourse();
+    }
+  }, [courseId, dispatch, isAdmin, isInstructor, loading]);
   useEffect(() => {
     const getLessonById = async () => {
       try {
@@ -88,53 +106,73 @@ const LessonDetail = () => {
     getLessonById();
   }, [courseId, id]);
   useEffect(() => {
-    const getLessonProgressesByUser = async () => {
-      try {
-        const result = await lessonProgressService.getLessonProgressesByUser();
-        console.log(result.data);
-        setLessonProgresses(result.data);
-      } catch (error) {
-        const status = error.status;
-        const message = error.data.message;
-        console.log(status, message);
-      }
-    };
-    getLessonProgressesByUser();
-  }, []);
+    if (!loading && !isAdmin && !isInstructor) {
+      const getLessonProgressesByUser = async () => {
+        try {
+          const result =
+            await lessonProgressService.getLessonProgressesByUser();
+          console.log(result.data);
+          setLessonProgresses(result.data);
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
+      };
+      getLessonProgressesByUser();
+    }
+  }, [isAdmin, isInstructor, loading]);
+  useEffect(() => {
+    const index = lessons?.findIndex((value) => value?._id == id);
+    if (
+      index < lessons?.length - 1 &&
+      lessonProgresses?.some(
+        (value) =>
+          value?.lesson_id?._id == lessons[index]?._id && value?.is_completed
+      )
+    ) {
+      navigate(`/course/${courseId}/lesson/${lessons[index + 1]?._id}`);
+    }
+  }, [courseId, id, lessonProgresses, lessons, navigate]);
   const createLessonProgress = async () => {
-    if (!lessonProgresses?.some((value) => value.lesson_id._id == id)) {
-      try {
-        const result = await lessonProgressService.createLessonProgress({
-          lessonId: id,
-        });
-        console.log(result.message || "Tạo tiến độ bài học thành công");
-        setLessonProgresses((prev) => [...prev, result.data]);
-      } catch (error) {
-        const status = error.status;
-        const message = error.data.message;
-        console.log(status, message);
+    if (!loading && !isAdmin && !isInstructor) {
+      if (!lessonProgresses?.some((value) => value.lesson_id._id == id)) {
+        try {
+          const result = await lessonProgressService.createLessonProgress({
+            lessonId: id,
+          });
+          console.log(result.data);
+          console.log(result.message || "Tạo tiến độ bài học thành công");
+          setLessonProgresses((prev) => [...prev, result.data]);
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
       }
     }
   };
   const updateLessonProgress = async () => {
-    const currentTime = playerRef?.current?.currentTime;
-    if (currentTime) {
-      try {
-        const result = await lessonProgressService.updateLessonProgress({
-          lessonId: id,
-          currentTime: Math.floor(currentTime),
-        });
-        console.log(result.message || "Cập nhật tiến độ bài học thành công");
-        // const newLessonProgresses = [...lessonProgresses];
-        // const index = newLessonProgresses.findIndex(
-        //   (value) => value.lesson_id._id == id
-        // );
-        // newLessonProgresses[index] = result.data;
-        // setLessonProgresses(newLessonProgresses);
-      } catch (error) {
-        const status = error.status;
-        const message = error.data.message;
-        console.log(status, message);
+    if (!loading && !isAdmin && !isInstructor) {
+      const currentTime = playerRef?.current?.currentTime;
+      if (currentTime) {
+        try {
+          const result = await lessonProgressService.updateLessonProgress({
+            lessonId: id,
+            currentTime: Math.floor(currentTime),
+          });
+          console.log(result.message || "Cập nhật tiến độ bài học thành công");
+          const newLessonProgresses = [...lessonProgresses];
+          const index = newLessonProgresses.findIndex(
+            (value) => value.lesson_id._id == id
+          );
+          newLessonProgresses[index] = result.data;
+          setLessonProgresses(newLessonProgresses);
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
       }
     }
   };
@@ -142,17 +180,21 @@ const LessonDetail = () => {
   return (
     <>
       <Navbar />
-      <div className="flex mt-8">
+      <div className="flex py-24">
         <div className="flex flex-col gap-y-2 w-[60%]">
           <div className="h-[450px] bg-surface-nav py-8 px-10">
             <ReactPlayer
-              onStart={() => (playerRef.current.currentTime = currentTime)}
+              onStart={() => {
+                if (!isAdmin && !isInstructor)
+                  playerRef.current.currentTime = currentTime;
+              }}
               onPlay={createLessonProgress}
               onProgress={updateLessonProgress}
               ref={playerRef}
               width={680}
               height={400}
               src={lesson?.video_url || null}
+              controls={isAdmin || isInstructor}
             />
           </div>
           <div className="flex gap-x-2 px-10 text-surface-nav">
@@ -182,6 +224,7 @@ const LessonDetail = () => {
               const prevLesson = lessons[index - 1];
               //Bài học chỉ có thể xem khi là bài học đầu tiên hoặc bài học phía trước đã hoàn thành
               const accessLesson =
+                isAdmin ||
                 value.order == 1 ||
                 (prevLesson &&
                   lessonProgresses?.some(
@@ -223,7 +266,13 @@ const LessonDetail = () => {
                   ) : accessLesson ? (
                     <IoPlayCircleOutline className="text-title-lg text-brand-blue" />
                   ) : (
-                    <IoIosLock className="text-title-lg" />
+                    <IoIosLock
+                      className={`text-title-lg ${
+                        value.order <= numberAccessLesson
+                          ? "text-brand-blue"
+                          : "text-surface-nav"
+                      } `}
+                    />
                   )}
                 </li>
               );
@@ -231,6 +280,7 @@ const LessonDetail = () => {
           </ul>
         </div>
       </div>
+      {me?.role_id?.role === "user" && <Footer />}
     </>
   );
 };

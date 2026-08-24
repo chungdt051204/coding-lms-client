@@ -1,14 +1,25 @@
 import ListCourses from "../components/ListCourses";
 import Navbar from "../components/Navbar";
 import image from "../assets/image.png";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { FaArrowRight } from "react-icons/fa6";
 import { IoBookOutline } from "react-icons/io5";
 import { RxPeople } from "react-icons/rx";
 import { LuAward } from "react-icons/lu";
 import { IoIosTrendingUp } from "react-icons/io";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { courseService } from "../services/courseService";
+import { setCourses } from "../stores/features/courseSlice";
+import Footer from "../components/Footer";
+import ChatBotAI from "../components/ChatBotAI";
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+  const { searchParams } = useSearchParams();
+  const dispatch = useDispatch();
+  const { item: me } = useSelector((state) => state.me);
+  const { items: courses, isLoading } = useSelector((state) => state.courses);
   const categories = useSelector((state) => state.categories.items);
   const items = [
     {
@@ -36,10 +47,31 @@ const LandingPage = () => {
       bgColor: "bg-orange-100",
     },
   ];
+  useEffect(() => {
+    const getApprovedCourses = async () => {
+      try {
+        const params = new URLSearchParams(searchParams);
+        params.append("page", 1);
+        params.append("limit", 6);
+        params.append("option", "newest");
+        const result = await courseService.getApprovedCourses({
+          params: params.toString(),
+        });
+        console.log(result.data);
+        dispatch(setCourses(result.data));
+      } catch (error) {
+        const status = error.status;
+        const message = error.message;
+        console.log(status, message);
+      }
+    };
+    getApprovedCourses();
+  }, [dispatch, searchParams]);
+
   return (
     <>
       <Navbar />
-      <div>
+      <div className="pt-10">
         <div className="h-[100vh] bg-auth py-24 px-40">
           <div className="flex justify-between">
             <div className="flex flex-col gap-y-4 w-[45%]">
@@ -56,11 +88,17 @@ const LandingPage = () => {
                 học đa dạng
               </p>
               <div className="flex justify-between">
-                <button className="flex justify-between gap-x-4 items-center py-2 px-4 rounded-[8px] bg-surface-white text-brand-blue text-title-lg font-medium transition-transform duration-300 hover:bg-surface-bg hover:cursor-pointer">
+                <button
+                  onClick={() => navigate("/courses")}
+                  className="flex justify-between gap-x-4 items-center py-2 px-4 rounded-[8px] bg-surface-white text-brand-blue text-title-lg font-medium transition-transform duration-300 hover:bg-surface-bg hover:cursor-pointer"
+                >
                   Khám phá khóa học
                   <FaArrowRight />
                 </button>
-                <button className=" py-2 px-8 rounded-[8px] bg-surface-white text-brand-blue text-title-lg font-medium transition-transform duration-300 hover:bg-surface-bg hover:cursor-pointer">
+                <button
+                  onClick={() => navigate("/register")}
+                  className=" py-2 px-8 rounded-[8px] bg-surface-white text-brand-blue text-title-lg font-medium transition-transform duration-300 hover:bg-surface-bg hover:cursor-pointer"
+                >
                   Đăng ký ngay
                 </button>
               </div>
@@ -69,6 +107,26 @@ const LandingPage = () => {
               <img src={image} alt="" className="rounded-[16px]" />
             </div>
           </div>
+        </div>
+        <div className="flex flex-col gap-y-16 py-16 px-40">
+          <div className="flex justify-between items-center">
+            <div className="flex flex-col gap-y-1">
+              <p className="text-surface-nav text-display-md font-bold">
+                Khóa học nổi bật
+              </p>
+              <p className="text-title-lg text-nav-muted">
+                Các khóa học mới cập nhật gần đây
+              </p>
+            </div>
+            <button
+              onClick={() => navigate("/courses")}
+              className="flex gap-x-4 items-center py-2 px-4 border border-gray-300 rounded-[8px] text-surface-nav text-title-lg font-medium transition-transform duration-300 hover:cursor-pointer hover:bg-surface-bg"
+            >
+              Xem tất cả
+              <FaArrowRight />
+            </button>
+          </div>
+          <ListCourses courses={courses} isLoading={isLoading} />
         </div>
         <div className="bg-surface-white py-16 px-48">
           <div className="flex justify-between">
@@ -111,7 +169,17 @@ const LandingPage = () => {
                 "text-green-500",
               ];
               return (
-                <div className="flex flex-col gap-y-4 w-[32%] border border-surface-bg rounded-[16px] bg-surface-white py-8 text-center transition-shadow duration-300 hover:shadow-lg hover:cursor-pointer">
+                <div
+                  onClick={() =>
+                    navigate(
+                      `/courses?search=${encodeURIComponent(
+                        value.item.category_name
+                      )}`
+                    )
+                  }
+                  key={index}
+                  className="flex flex-col gap-y-4 w-[32%] border border-surface-bg rounded-[16px] bg-surface-white py-8 text-center transition-shadow duration-300 hover:shadow-lg hover:cursor-pointer"
+                >
                   <div
                     className={`mx-auto py-4 px-4 rounded-[16px] ${bgColors[index]}`}
                   >
@@ -132,39 +200,9 @@ const LandingPage = () => {
             })}
           </div>
         </div>
-        <div className="flex flex-col gap-y-16 py-16 px-40">
-          <div className="flex justify-between items-center">
-            <div className="flex flex-col gap-y-1">
-              <p className="text-surface-nav text-display-md font-bold">
-                Khóa học nổi bật
-              </p>
-              <p className="text-title-lg text-nav-muted">
-                Các khóa học mới cập nhật gần đây
-              </p>
-            </div>
-            <button className="flex gap-x-4 items-center py-2 px-4 border border-gray-300 rounded-[8px] text-surface-nav text-title-lg font-medium transition-transform duration-300 hover:cursor-pointer hover:bg-surface-bg">
-              Xem tất cả
-              <FaArrowRight />
-            </button>
-          </div>
-          <ListCourses />
-        </div>
-        <div className="flex flex-col gap-y-8 py-24 px-40 bg-auth">
-          <div className="flex flex-col gap-y-2 text-center text-surface-white">
-            <p className="text-display-md font-bold">
-              Bắt đầu hành trình học tập ngay hôm nay
-            </p>
-            <p className="text-title-lg">
-              Tham gia cùng hàng nghìn học viên đang nâng cao kỹ năng lập trình
-              của họ
-            </p>
-          </div>
-          <button className="flex justify-between gap-x-4 items-center w-[25%] mx-auto py-2 px-4 rounded-[8px] bg-surface-white text-brand-blue text-title-lg font-medium transition-transform duration-300 hover:bg-surface-bg hover:cursor-pointer">
-            Khám phá khóa học
-            <FaArrowRight />
-          </button>
-        </div>
       </div>
+      {me && <ChatBotAI />}
+      <Footer />
     </>
   );
 };

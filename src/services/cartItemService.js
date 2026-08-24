@@ -6,10 +6,7 @@ export const cartItemService = {
     return response;
   },
   deleteCartItemsSelected: async ({ cartItemIds }) => {
-    const response = await axiosClient.delete(
-      `/cartItems?cartItemIds=${cartItemIds}`,
-      { cartItemIds }
-    );
+    const response = await axiosClient.post(`/cartItems`, cartItemIds);
     return response;
   },
 };

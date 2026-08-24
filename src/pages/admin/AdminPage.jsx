@@ -1,11 +1,12 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
+
 export const AdminPage = () => {
   return (
     <>
       <Navbar />
-      <div className="flex justify-between">
+      <div className="flex justify-between pt-20">
         <div className="w-[20%]">
           <Sidebar />
         </div>

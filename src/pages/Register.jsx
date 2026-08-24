@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { IoBookOutline } from "react-icons/io5";
 import { authService } from "../services/authService";
-import { validateForm } from "../helper/validateForm";
+import { validateForm } from "../../helper/validateForm";
 import { toast } from "react-toastify";
 
 const Register = () => {
@@ -26,12 +26,14 @@ const Register = () => {
   });
   const handleRegister = async (e) => {
     e.preventDefault();
+    const data = {
+      fullName: formData.fullName,
+      email: formData.email,
+      password: formData.password,
+    };
     if (
-      !validateForm.validateFormAuth({
-        fullName: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        role: formData.role,
+      !validateForm.validateUserForm({
+        formData: data,
         setError,
       })
     ) {
@@ -159,10 +161,12 @@ const Register = () => {
                       type="radio"
                     />
                     <p className="text-body-lg font-medium text-surface-nav ms-2">
-                      {value.display_name}
+                      {value.role === "user" ? "Học viên" : "Giảng viên"}
                     </p>
                     <p className="text-body-md font-medium text-nav-muted ms-2">
-                      {value.description}
+                      {value.role === "user"
+                        ? "Tham gia và học khóa học"
+                        : "Tạo và bán khóa học"}
                     </p>
                   </div>
                 );

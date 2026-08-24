@@ -1,0 +1,732 @@
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { courseService } from "../services/courseService";
+import Navbar from "../components/Navbar";
+import { FaStar } from "react-icons/fa";
+import { RxPeople } from "react-icons/rx";
+import { IoBookOutline } from "react-icons/io5";
+import { IoPlayCircleOutline } from "react-icons/io5";
+import { FaCheck } from "react-icons/fa6";
+import { IoIosLock } from "react-icons/io";
+import { enrollmentService } from "../services/enrollmentService";
+import { toast } from "react-toastify";
+import { setEnrollments } from "../stores/features/enrollmentSlice";
+import { createNotification } from "../stores/features/notificationSlice";
+import { lessonProgressService } from "../services/lessonProgressService";
+import { cartService } from "../services/cartService";
+import { testService } from "../services/testService";
+import { addToCart } from "../stores/features/cartSlice";
+import { FiFileText } from "react-icons/fi";
+import { LuTimer } from "react-icons/lu";
+import { FiTarget } from "react-icons/fi";
+import { FaAngleRight } from "react-icons/fa6";
+import { format } from "../../helper/format";
+import { FaRegStar } from "react-icons/fa";
+import { ratingService } from "../services/ratingService";
+import { Progress } from "antd";
+import { LuInbox } from "react-icons/lu";
+import { conversationService } from "../services/conversationService";
+import { FiMessageCircle } from "react-icons/fi";
+import ConversationDetail from "../components/ConversationDetail";
+import Footer from "../components/Footer";
+
+const CourseDetail = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const enrollments = useSelector((state) => state.enrollments.items);
+  const { item: me } = useSelector((state) => state.me);
+  const isAdmin = me?.role_id?.role === "admin";
+  const isInstructor = me?.role_id?.role === "instructor";
+  const { id } = useParams();
+  const [course, setCourse] = useState(null);
+  const [ratings, setRatings] = useState([]);
+  const [myRating, setMyRating] = useState(null);
+  const [lessonProgresses, setLessonProgresses] = useState([]);
+  const [test, setTest] = useState(null);
+  const [refresh, setRefresh] = useState(0);
+
+  const enrolledCourse = enrollments?.arrayEnrollment?.find(
+    (value) => value?.item?.course_id?._id == id
+  );
+  const completedCourse = enrolledCourse?.item?.progress_percent == 100;
+  const accessedTest =
+    enrolledCourse?.item?.total_lessons ===
+    enrolledCourse?.item?.completed_lessons;
+  const numberAccessLesson =
+    enrolledCourse?.item?.access_level == "LIMITED"
+      ? (course?.lessons?.length * 50) / 100
+      : enrolledCourse?.item?.access_level == "UNLIMITED"
+      ? course?.lessons?.length
+      : 0;
+  const myCart = useSelector((state) => state.cart);
+  const courseInCart = myCart.items?.some((value) => value.course_id._id == id);
+  const ratingStar = [
+    { star: 1, comment: "Khóa học rất tệ" },
+    { star: 2, comment: "Khóa học bình thường" },
+    { star: 3, comment: "Khóa học tạm ổn" },
+    { star: 4, comment: "Khóa học rất hay" },
+    { star: 5, comment: "Khóa học rất tuyệt vời" },
+  ];
+  const [idx, setIdx] = useState(-1);
+  const [comment, setComment] = useState("");
+  const [clicked, setClicked] = useState(false);
+  const [isDropdown, setIsDropdown] = useState(true);
+
+  const { items: roles } = useSelector((state) => state.roles);
+  const getRole = ({ roleId }) => {
+    const role = roles?.find((value) => value._id == roleId);
+    return role?.role;
+  };
+  const [conversation, setConversation] = useState(null);
+  const conversationInfo = {
+    conversationId: conversation?.item?._id,
+    userId: me?._id,
+    instructorId: course?.item?.user_id?._id,
+    courseId: id,
+    userAvatar: course?.item?.user_id?.avatar,
+    userFullName: course?.item?.user_id?.full_name,
+    courseImage: course?.item?.image_url,
+    courseName: course?.item?.course_name,
+    messages: conversation?.messages,
+  };
+
+  const secondToTime = (second) => {
+    if (second < 60) return `00:${String(second).padStart(2, "0")}`;
+    if (second >= 60 && second < 3600)
+      return `${Math.floor(second / 60)}:${String(second % 60).padStart(
+        2,
+        "0"
+      )}`;
+    if (second >= 3600)
+      return `${Math.floor(second / 3600)}:${String(
+        Math.floor((second % 3600) / 60)
+      ).padStart(2, "0")}:${(second % 3600) % 60}`;
+  };
+
+  useEffect(() => {
+    if (id) {
+      const getCourseById = async () => {
+        try {
+          const result = await courseService.getCourseById({ courseId: id });
+          console.log(result.data);
+          setCourse(result.data);
+          setRatings(result.data?.ratings);
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
+      };
+      getCourseById();
+    }
+  }, [id, dispatch, refresh]);
+  useEffect(() => {
+    if (me) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setMyRating(
+        ratings?.find(
+          (value) => value.course_id == id && value?.user_id?._id == me?._id
+        )
+      );
+      const getEnrollmentsByUser = async () => {
+        try {
+          const result = await enrollmentService.getEnrollmentsByUser({
+            params: {},
+          });
+          dispatch(setEnrollments(result.data));
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
+      };
+      getEnrollmentsByUser();
+      const getLessonProgressesByUser = async () => {
+        try {
+          const result =
+            await lessonProgressService.getLessonProgressesByUser();
+          console.log(result.data);
+          setLessonProgresses(result.data);
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
+      };
+      getLessonProgressesByUser();
+    }
+  }, [me, dispatch, id, ratings]);
+
+  useEffect(() => {
+    console.log(myRating);
+    if (myRating) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIdx(myRating?.rating_star - 1);
+      setComment(myRating?.comment || "");
+    }
+  }, [myRating]);
+
+  useEffect(() => {
+    if (enrolledCourse || isAdmin || isInstructor) {
+      const getTestByCourse = async () => {
+        try {
+          const result = await testService.getTestByCourse({ courseId: id });
+          console.log(result.data);
+          setTest(result.data);
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
+      };
+      getTestByCourse();
+      const getConversationByParticipantsAndCourse = async () => {
+        try {
+          const result =
+            await conversationService.getConversationByParticipantsAndCourse({
+              instructorId: course?.item?.user_id?._id,
+              courseId: id,
+            });
+          console.log(result.data);
+          setConversation(result.data);
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
+      };
+      getConversationByParticipantsAndCourse();
+    }
+  }, [enrolledCourse, id, course, isAdmin, isInstructor]);
+
+  const handleCreateEnrollment = async () => {
+    if (!me) {
+      toast.warning("Bạn chưa đăng nhập!");
+      return;
+    }
+    try {
+      const result = await enrollmentService.createEnrollment({
+        data: { courseId: id, accessLevel: "UNLIMITED" },
+      });
+      console.log(result.data);
+      dispatch(createNotification(result.data?.result2));
+      toast.success(result.message || "Đăng ký học khóa học thành công");
+      setRefresh((prev) => prev + 1);
+    } catch (error) {
+      const status = error.status;
+      const message = error.data.message;
+      console.log(status, message);
+    }
+  };
+  const handleAddToCart = async () => {
+    if (!me) {
+      toast.warning("Bạn chưa đăng nhập!");
+      return;
+    }
+    if (courseInCart) {
+      toast.warning("Khóa học này đã có trong giỏ hàng!");
+      return;
+    }
+    try {
+      const result = await cartService.addToCart({ courseId: id });
+      console.log(result.data);
+      dispatch(addToCart(result.data));
+      toast.success(result.message || "Thêm khóa học vào giỏ hàng thành công");
+    } catch (error) {
+      const status = error.status;
+      const message = error.data.message;
+      console.log(status, message);
+    }
+  };
+  const handleRating = async () => {
+    if (!me) {
+      toast.warning("Vui lòng đăng nhập để thực hiện đánh giá!");
+      return;
+    } else if (!enrolledCourse) {
+      toast.warning("Bạn chưa sỡ hữu khóa học, không thể đánh giá!");
+      return;
+    } else if (!completedCourse) {
+      toast.warning("Bạn chưa hoàn thành khóa học, không thể đánh giá!");
+      return;
+    } else if (idx == -1) {
+      toast.warning("Vui lòng chọn số sao để đánh giá!");
+      return;
+    }
+    try {
+      const result = await ratingService.createRating({
+        data: {
+          courseId: id,
+          ratingStar: idx + 1,
+          comment: comment || ratingStar[idx].comment,
+        },
+      });
+      console.log(result);
+      setRefresh((prev) => prev + 1);
+      toast.success(result.message || "Tạo đánh giá thành công");
+    } catch (error) {
+      const status = error.status;
+      const message = error.data.message;
+      console.log(status, message);
+    }
+  };
+
+  return (
+    <>
+      <Navbar />
+      <div className="flex flex-col gap-y-10 py-18 bg-surface-bg">
+        {enrolledCourse && (
+          <button
+            onClick={() => setClicked((prev) => !prev)}
+            className={`fixed border bottom-5 right-5 text-surface-white border-none bg-auth ${
+              clicked ? "py-2" : "py-3"
+            } px-6 rounded-[1000px] text-title-sm font-medium transition-transform duration-300 hover:scale-105 hover:cursor-pointer`}
+          >
+            {clicked ? (
+              "X"
+            ) : (
+              <div className="flex gap-x-2 items-center ">
+                <FiMessageCircle className="text-headline-sm" />
+                <p>Chat với giảng viên</p>
+              </div>
+            )}
+          </button>
+        )}
+        <ConversationDetail
+          conversationInfo={conversationInfo}
+          me={me}
+          getRole={getRole}
+          isClicked={clicked}
+          setIsClicked={setClicked}
+          isDropdown={isDropdown}
+          setIsDropdown={setIsDropdown}
+        />
+        {/* Box 1 */}
+        <div className="flex flex-col justify-between h-[1100px] bg-primary-purple py-12 px-28">
+          <div className="flex flex-col justify-between h-[30%]">
+            <div className="flex gap-x-2 text-title-lg text-surface-white">
+              <div className="px-3 bg-primary-purple-light rounded-[8px]">
+                {course?.item?.category_id.category_name || ""}
+              </div>
+              <div className="px-3 bg-primary-purple-light rounded-[8px]">
+                {course?.item?.level || ""}
+              </div>
+            </div>
+            <p className="text-display-lg text-surface-white font-medium">
+              {course?.item?.course_name || ""}
+            </p>
+            <p className="text-headline-sm text-surface-bg">
+              {course?.item?.description || ""}
+            </p>
+            {!isAdmin && (
+              <div className="flex gap-x-8 text-headline-sm text-surface-white">
+                <div className="flex items-center gap-x-1">
+                  <FaStar className="text-yellow-300" />
+                  <p>
+                    {course?.averageStar} ({course?.ratings?.length} đánh giá)
+                  </p>
+                </div>
+                <div className="flex items-center gap-x-1">
+                  <RxPeople className="text-surface-white" />
+                  <p>{course?.numberEnrollment} học viên</p>
+                </div>
+              </div>
+            )}
+            <div className="flex gap-x-4">
+              <img
+                className="w-[60px] h-[60px] object-cover rounded-[1000px]"
+                src={course?.item?.user_id?.avatar || null}
+              />
+              <div className="flex flex-col">
+                <p className="text-title-lg text-surface-bg">Giảng viên</p>
+                <p className="text-headline-sm text-surface-white font-medium">
+                  {course?.item?.user_id?.full_name || ""}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col justify-between h-[65%] bg-surface-white rounded-[16px] p-8">
+            <img
+              className="w-full h-[400px] object-fill rounded-[16px]"
+              src={course?.item?.thumbnail_url || null}
+              alt=""
+            />
+            <p className="text-display-md text-brand-blue font-medium">
+              {course?.item?.is_free
+                ? 0
+                : format.formatPrice({ price: course?.item?.price })}
+              đ
+            </p>
+            {!enrolledCourse && !isAdmin && !isInstructor && (
+              <button
+                onClick={
+                  course?.item?.is_free
+                    ? handleCreateEnrollment
+                    : handleAddToCart
+                }
+                className="bg-surface-nav py-2 text-headline-sm text-surface-white rounded-[8px] transition-transform duration-300 hover:cursor-pointer hover:text-surface-bg"
+              >
+                {course?.item?.is_free
+                  ? "Đăng ký học ngay"
+                  : courseInCart
+                  ? "Đã thêm vào giỏ hàng"
+                  : "Thêm vào giỏ hàng"}
+              </button>
+            )}
+            <div className="flex flex-col">
+              <div className="flex gap-x-2 items-center text-headline-sm">
+                <IoBookOutline className="text-nav-muted" />
+                <p>{course?.lessons?.length + " " + "bài học"}</p>
+              </div>
+              <div className="flex gap-x-2 items-center text-headline-sm">
+                <IoPlayCircleOutline className="text-nav-muted" />
+                <p>Truy cập trọn đời</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {(!isAdmin || course?.item?.status == "approved") && (
+          <div className="px-28">
+            <div className="flex flex-col gap-y-8 border border-gray-300 rounded-[16px] p-8 bg-surface-white">
+              <p className="text-headline-md text-surface-nav font-medium">
+                Đánh giá từ học viên
+              </p>
+              <div className="flex justify-between items-center p-6 bg-blue-50 rounded-[16px]">
+                <div className="flex flex-col gap-y-2 w-[20%] text-center">
+                  <p className="text-display-lg text-brand-blue font-bold">
+                    {course?.averageStar > 0 ? course?.averageStar : "0.0"}
+                  </p>
+                  <div className="flex gap-x-1">
+                    {ratingStar?.map((_, i) => {
+                      return i <= course?.averageStar - 1 ? (
+                        <FaStar
+                          key={i}
+                          className="text-display-sm text-yellow-300"
+                        />
+                      ) : (
+                        <FaRegStar
+                          key={i}
+                          className="text-display-sm text-gray-300"
+                        />
+                      );
+                    })}
+                  </div>
+                  <p className="text-title-sm text-nav-muted">
+                    {course?.ratings?.length} đánh giá
+                  </p>
+                </div>
+                <div className="flex flex-col gap-y-4 w-[78%]">
+                  {course?.ratingStats?.map((value, index) => {
+                    return (
+                      <div className="flex gap-x-6" key={index}>
+                        <p className="w-[50px] text-title-sm text-surface-nav">
+                          {value.star} sao
+                        </p>
+                        <Progress
+                          key={index}
+                          percent={
+                            value.count == 0 ? 0 : 100 / Number(value.count)
+                          }
+                          status="normal"
+                          showInfo={false}
+                        />
+                        <p className="w-[100px] text-title-sm text-nav-muted">
+                          {value.count == 0 ? 0 : 100 / Number(value.count)} %
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              {!isInstructor && !isAdmin && (
+                <div className="flex flex-col gap-y-4 p-5 bg-gray-50 rounded-[16px]">
+                  <p className="text-headline-sm text-surface-nav font-medium">
+                    Viết đánh giá của bạn
+                  </p>
+                  <div className="flex gap-x-2 items-start">
+                    <p className="text-title-sm text-surface-nav">Đánh giá:</p>
+                    <div className="flex flex-col gap-y-1">
+                      <div className="flex gap-x-1">
+                        {ratingStar?.map((_, i) => {
+                          return i <= idx ? (
+                            <FaStar
+                              key={i}
+                              onClick={() => {
+                                if (!myRating) setIdx(i);
+                              }}
+                              className={`text-headline-md text-yellow-300 ${
+                                myRating && "hover:cursor-not-allowed"
+                              }`}
+                            />
+                          ) : (
+                            <FaRegStar
+                              key={i}
+                              onClick={() => {
+                                if (!myRating) setIdx(i);
+                              }}
+                              className={`text-headline-md text-gray-300 ${
+                                myRating && "hover:cursor-not-allowed"
+                              }`}
+                            />
+                          );
+                        })}
+                      </div>
+                      {idx != -1 && (
+                        <p className="text-body-md text-surface-nav">
+                          ({ratingStar[idx].comment})
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <textarea
+                    onChange={(e) => setComment(e.target.value)}
+                    value={comment}
+                    disabled={myRating}
+                    className="p-4 rounded-[8px] bg-surface-bg text-title-sm text-nav-muted"
+                    placeholder="Chia sẻ của bạn về khóa học"
+                  ></textarea>
+                  <button
+                    onClick={!myRating && handleRating}
+                    className={`border ${
+                      myRating
+                        ? "hover:cursor-not-allowed"
+                        : "hover:cursor-pointer hover:text-surface-bg"
+                    } w-[15%] py-2 bg-surface-nav text-title-sm font-medium text-surface-white rounded-[8px] transition-transform duration-300`}
+                  >
+                    Gửi đánh giá
+                  </button>
+                </div>
+              )}
+              <div className="flex flex-col gap-y-6">
+                <p className="text-title-lg text-surface-nav font-medium">
+                  Tất cả đánh giá
+                </p>
+                <div className="flex flex-col gap-y-4">
+                  {ratings?.length > 0 ? (
+                    ratings?.map((value) => {
+                      return (
+                        <div className="flex gap-x-4" key={value._id}>
+                          <img
+                            className="w-[40px] h-[40px] rounded-[1000px] object-cover"
+                            src={value?.user_id?.avatar}
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="flex flex-col gap-y-1 w-full">
+                            <div className="flex justify-between">
+                              <p className="text-title-sm text-surface-nav font-medium">
+                                {value?.user_id?.full_name}
+                              </p>
+                              <p className="text-title-sm text-nav-muted">
+                                {format.formatDate({
+                                  date: value?.createdAt,
+                                })}
+                              </p>
+                            </div>
+                            <div className="flex gap-x-1">
+                              {ratingStar?.map((_, i) => {
+                                return i <= value?.rating_star - 1 ? (
+                                  <FaStar
+                                    key={i}
+                                    className="text-headline-sm text-yellow-300"
+                                  />
+                                ) : (
+                                  <FaRegStar
+                                    key={i}
+                                    className="text-headline-sm text-gray-300"
+                                  />
+                                );
+                              })}
+                            </div>
+                            <p className="text-title-sm text-nav-muted">
+                              {value?.status
+                                ? value?.comment
+                                : "Bình luận này đã bị ẩn bởi quản trị viên"}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted w-[95%] mt-6">
+                      <LuInbox className="text-display-md text-gray-300" />
+                      <p>Chưa có đánh giá nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Box 2 */}
+        <div className="px-28">
+          {/* Yêu cầu */}
+          <div className="flex flex-col gap-y-4 px-8 py-4 bg-surface-white border border-gray-300 rounded-[16px]">
+            <p className="text-headline-md text-surface-nav font-medium">
+              Yêu cầu
+            </p>
+            <ul className="flex flex-col gap-y-2">
+              {course?.item?.requirements?.map((value, index) => {
+                return (
+                  <li key={index} className="flex gap-x-1 items-center">
+                    <p className="text-brand-blue">✓</p>
+                    {value}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          {/* Kết quả đạt được */}
+          <div className="flex flex-col gap-y-4 px-8 py-4 mt-8 bg-surface-white border border-gray-300 rounded-[16px]">
+            <p className="text-headline-md text-surface-nav font-medium">
+              Bạn sẽ học được gì ?
+            </p>
+            <ul className="flex flex-col gap-y-2">
+              {course?.item?.objectives?.map((value, index) => {
+                return (
+                  <li key={index} className="flex gap-x-1 items-center">
+                    <FaCheck className="text-green-500" />
+                    {value}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          {/* Nội dung khóa học */}
+          <div className="flex flex-col gap-y-4 px-8 py-4 mt-8 bg-surface-white border border-gray-300 rounded-[16px]">
+            <div className="flex justify-between">
+              <p className="text-headline-md text-surface-nav font-medium">
+                Nội dung khóa học
+              </p>
+              <p className="text-title-sm text-surface-nav font-medium">
+                {course?.lessons?.length + " " + "bài học"}
+              </p>
+            </div>
+            <ul className="flex flex-col gap-y-2">
+              {course?.lessons?.map((value, index) => {
+                const isCompleted = lessonProgresses?.some(
+                  (item) => item.lesson_id._id == value._id && item.is_completed
+                );
+                const prevLesson = course?.lessons[index - 1];
+                const accessLesson =
+                  (enrolledCourse && value.order == 1) ||
+                  isAdmin ||
+                  isInstructor ||
+                  (prevLesson &&
+                    lessonProgresses?.some(
+                      (item) =>
+                        item.lesson_id._id == prevLesson?._id &&
+                        item.is_completed
+                    ));
+                return (
+                  <li
+                    onClick={() => {
+                      if (isAdmin || isInstructor)
+                        navigate(`/course/${id}/lesson/${value._id}`);
+                      else {
+                        if (!enrolledCourse) {
+                          toast.warning("Bạn chưa sỡ hữu khóa học này!");
+                          return;
+                        } else if (value.order > numberAccessLesson) {
+                          toast.warning(
+                            "Vui lòng thanh toán đầy đủ khóa học để mở khóa toàn bộ bài học!"
+                          );
+                        } else if (isCompleted) {
+                          toast.success("Bài học này đã hoàn thành!");
+                          return;
+                        } else if (!accessLesson) {
+                          toast.warning("Bạn chưa hoàn thành bài học trước!");
+                          return;
+                        } else navigate(`/course/${id}/lesson/${value._id}`);
+                      }
+                    }}
+                    key={value._id}
+                    className={`flex justify-between items-center p-4 border border-gray-300 rounded-[8px] transition-transform duration-300 ${
+                      isCompleted || accessLesson
+                        ? "hover:cursor-pointer"
+                        : "hover:cursor-not-allowed"
+                    } hover:bg-surface-bg`}
+                  >
+                    <div className="flex items-center gap-x-2 text-title-lg">
+                      <div className="px-4 py-2 text-brand-blue font-medium bg-blue-200 rounded-[8px]">
+                        {index + 1}
+                      </div>
+                      <p className="text-surface-nav font-medium">
+                        {value.lesson_name}
+                      </p>
+                    </div>
+                    {isCompleted ? (
+                      <FaCheck className="text-green-500" />
+                    ) : accessLesson ? (
+                      <div className="flex gap-x-2 items-center">
+                        <p>{secondToTime(value.duration)}</p>
+                        <IoPlayCircleOutline className="text-headline-md text-brand-blue" />
+                      </div>
+                    ) : (
+                      <IoIosLock
+                        className={`${
+                          value.order <= numberAccessLesson
+                            ? "text-brand-blue"
+                            : "text-surface-nav"
+                        } `}
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          {test &&
+            accessedTest &&
+            (enrolledCourse?.item?.access_level === "UNLIMITED" ||
+              isAdmin ||
+              isInstructor) && (
+              <div className="p-6 rounded-[16px] mt-10 bg-surface-white border border-gray-300">
+                <div className="flex justify-between items-center">
+                  <p className="text-headline-md text-surface-nav font-medium">
+                    Bài kiểm tra
+                  </p>
+                  <p className="text-title-sm text-purple-700 font-medium px-2 py-1 rounded-[8px] bg-purple-100">
+                    1 bài kiểm tra
+                  </p>
+                </div>
+                <div
+                  onClick={() =>
+                    navigate(`/course/${id}/test/${test?.item?._id}`)
+                  }
+                  className="flex justify-between items-start border rounded-[8px] p-5 mt-6 border-2 border-purple-100 transition-transform duration-300 hover:border-purple-300 hover:cursor-pointer "
+                >
+                  <div className="flex gap-x-4">
+                    <div className="p-3 bg-auth rounded-[8px] transition-transform duration-300 hover:scale-105">
+                      <FiFileText className="text-headline-md text-surface-white" />
+                    </div>
+                    <div className="flex flex-col gap-y-2">
+                      <p className="text-title-lg text-surface-nav font-medium transition-transform duration-300 hover:text-purple-500">
+                        {test?.item?.test_name || ""}
+                      </p>
+                      <div className="flex gap-x-4 text-title-sm text-nav-muted">
+                        <div className="flex gap-x-2 items-center">
+                          <FiFileText />
+                          <p>{test?.numberQuestion} câu hỏi</p>
+                        </div>
+                        <div className="flex gap-x-2 items-center">
+                          <LuTimer />
+                          <p>{test?.item?.duration_minutes || ""} phút</p>
+                        </div>
+                        <div className="flex gap-x-2 items-center">
+                          <FiTarget />
+                          <p>Điểm đạt: {test?.item?.pass_score || ""} %</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <FaAngleRight className="text-headline-sm text-purple-500" />
+                </div>
+              </div>
+            )}
+        </div>
+      </div>
+      {me?.role_id?.role == "user" && <Footer />}
+    </>
+  );
+};
+export default CourseDetail;

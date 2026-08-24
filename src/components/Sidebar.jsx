@@ -6,6 +6,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import { RxPeople } from "react-icons/rx";
 import { BiComment } from "react-icons/bi";
 import { LuUserRound } from "react-icons/lu";
+import { LuInbox } from "react-icons/lu";
 export const Sidebar = () => {
   const me = useSelector((state) => state.me.item);
   const currenRole = me?.role_id.role || "user";
@@ -49,6 +50,11 @@ export const Sidebar = () => {
         item: <BiComment />,
         title: "Bình luận",
         route: "/admin/comments",
+      },
+      {
+        item: <LuInbox />,
+        title: "Đơn hàng",
+        route: "/admin/orders",
       },
     ],
   };

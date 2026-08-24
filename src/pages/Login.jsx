@@ -5,37 +5,40 @@ import { IoBookOutline } from "react-icons/io5";
 import { authService } from "../services/authService";
 import { setIsLogin } from "../stores/features/authSlice";
 import { setMe } from "../stores/features/meSlice";
-import { validateForm } from "../helper/validateForm";
+import { validateForm } from "../../helper/validateForm";
 import { toast } from "react-toastify";
 import { api } from "../App";
 import logo_google from "../assets/logo-google.png";
+import { socket } from "../../socket";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState({ errorEmail: "", errorPassword: "" });
+  const [errorLogin, setErrorLogin] = useState("");
   const handleLogin = async (e) => {
     e.preventDefault();
+    const data = { email: formData.email, password: formData.password };
     if (
-      !validateForm.validateFormAuth({
-        email: formData.email,
-        password: formData.password,
+      !validateForm.validateUserForm({
+        formData: data,
         setError,
       })
     )
       return;
     try {
       const result = await authService.Login({ data: formData });
-      localStorage.setItem("token", result.token);
+      sessionStorage.setItem("token", result.token);
       dispatch(setIsLogin(true));
       dispatch(setMe(result.data));
       console.log(result.data.role_id.role);
       toast.success(result?.message || "Đăng nhập thành công");
+      socket.emit("join-user", result?.data?._id);
       setTimeout(() => {
-        if (result.data.role_id.role === "instructor")
+        if (result.data.role_id.role === "instructor") {
           navigate("/instructor/dashboard");
-        else if (result.data.role_id.role === "admin")
+        } else if (result.data.role_id.role === "admin")
           navigate("/admin/dashboard");
         else navigate("/");
       }, 1000);
@@ -46,6 +49,9 @@ const Login = () => {
         setError((prev) => ({ ...prev, errorEmail: message }));
       if (status === 401)
         setError((prev) => ({ ...prev, errorPassword: message }));
+      if (status === 403) setErrorLogin(message);
+      if (status === 429)
+        setErrorLogin("Quá nhiều lần thử! Vui lòng thử lại sau 15 phút!");
       console.log(message);
     }
   };
@@ -108,6 +114,7 @@ const Login = () => {
             />
             <span className="text-body-md font-medium text-red-500">
               {error?.errorPassword}
+              {errorLogin}
             </span>
             <input
               className="p-2 border-1 rounded-[8px] mt-[15px] text-title-lg font-medium text-surface-white bg-surface-nav hover:cursor-pointer hover:text-surface-bg"

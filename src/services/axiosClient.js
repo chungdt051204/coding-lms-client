@@ -1,14 +1,14 @@
 import axios from "axios";
 export const axiosClient = axios.create({
-  baseURL: "https://lms-server-2xk1.onrender.com",
+  baseURL: "http://localhost:3000",
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000,
+  timeout: 100000,
 });
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
@@ -21,6 +21,6 @@ axiosClient.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    return Promise.reject(error.response);
+    return Promise.reject(error?.response);
   }
 );
