@@ -172,7 +172,9 @@ const Instructors = () => {
         </div>
         <div className="flex flex-col gap-y-6 w-[95%]">
           {isLoading ? (
-            <p>Đang tải dữ liệu...</p>
+            <p className="text-title-lg text-surface-nav text-center">
+              Đang tải dữ liệu...
+            </p>
           ) : instructors?.arrayInstructor?.length == 0 ? (
             <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted w-[95%] mt-6">
               <LuInbox className="text-display-md text-gray-300" />
