@@ -1,6 +1,6 @@
 import axios from "axios";
 export const axiosClient = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://lms-server-2xk1.onrender.com",
   headers: {
     "Content-Type": "application/json",
   },
