@@ -4,6 +4,7 @@ import { userService } from "../../services/userService";
 import { IoEyeOutline } from "react-icons/io5";
 import { LuInbox } from "react-icons/lu";
 import PaginationButton from "../../components/PaginationButton";
+
 const Students = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -31,8 +32,8 @@ const Students = () => {
 
   return (
     <>
-      <div className="w-[100%] py-8">
-        <div className="h-[70px] flex flex-col justify-between">
+      <div className="w-[100%] px-6 md:px-8 py-8">
+        <div className="flex flex-col gap-y-2">
           <p className="text-display-sm text-surface-nav font-bold">
             Quản lý học viên
           </p>
@@ -40,13 +41,11 @@ const Students = () => {
             Xem và quản lý học viên đã đăng ký khóa học
           </p>
         </div>
-        <div className="flex flex-col gap-y-6 w-[95%]">
+        <div className="flex flex-col gap-y-6">
           {isLoading ? (
-            <p className="text-title-lg text-surface-nav text-center">
-              Đang tải dữ liệu...
-            </p>
+            <p>Đang tải dữ liệu...</p>
           ) : students?.items?.length == 0 ? (
-            <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted w-[95%] mt-6">
+            <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
               <LuInbox className="text-display-md text-gray-300" />
               <p>Chưa có học viên nào</p>
             </div>
@@ -54,8 +53,8 @@ const Students = () => {
             <table className="border-separate border-spacing-0 overflow-hidden border-1 border-surface-bg rounded-[16px] mt-6">
               <thead>
                 <tr className="flex items-center justify-between text-surface-nav font-medium">
-                  <td className="w-[30%] p-2">Học viên</td>
-                  <td className="w-[20%] p-2 text-right">Thao tác</td>
+                  <td className="w-[60%] p-2">Học viên</td>
+                  <td className="w-[25%] p-2 text-right">Thao tác</td>
                 </tr>
               </thead>
               <tbody>
@@ -65,9 +64,9 @@ const Students = () => {
                       className="flex justify-between items-center border border-surface-bg hover:bg-surface-bg"
                       key={value._id}
                     >
-                      <td className="flex items-center gap-x-2 w-[30%] p-2">
+                      <td className="flex items-center gap-x-2 w-[60%] p-2">
                         <img
-                          className="w-[40px] h-[40px] rounded-[1000px] object-cover"
+                          className="w-[44px] h-[44px] rounded-[1000px] object-cover"
                           src={value.avatar}
                           referrerPolicy="no-referrer"
                         />
@@ -80,7 +79,7 @@ const Students = () => {
                           </p>
                         </div>
                       </td>
-                      <td className="flex justify-end gap-x-2 items-center w-[20%] pe-2">
+                      <td className="flex justify-end gap-x-2 items-center w-[25%] pe-2">
                         <IoEyeOutline
                           onClick={() =>
                             navigate(`/instructor/student/${value._id}`)

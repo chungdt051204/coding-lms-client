@@ -6,11 +6,11 @@ export const AdminPage = () => {
   return (
     <>
       <Navbar />
-      <div className="flex justify-between pt-20">
-        <div className="w-[20%]">
+      <div className="flex flex-col lg:flex-row lg:justify-between pt-20">
+        <div className="w-full lg:w-[20%]">
           <Sidebar />
         </div>
-        <div className="w-[78%]">
+        <div className="w-full lg:w-[78%]">
           <Outlet />
         </div>
       </div>

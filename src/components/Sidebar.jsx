@@ -7,6 +7,7 @@ import { RxPeople } from "react-icons/rx";
 import { BiComment } from "react-icons/bi";
 import { LuUserRound } from "react-icons/lu";
 import { LuInbox } from "react-icons/lu";
+
 export const Sidebar = () => {
   const me = useSelector((state) => state.me.item);
   const currenRole = me?.role_id.role || "user";
@@ -60,11 +61,11 @@ export const Sidebar = () => {
   };
   return (
     <>
-      <div className="p-3">
-        <ul className="flex flex-col justify-between h-[220px]">
+      <div className="p-3 md:ms-6">
+        <ul className="flex flex-col md:flex-row md:flex-wrap md:gap-x-4 lg:flex-col gap-y-2">
           {sideBarItem[currenRole]?.map((value, index) => {
             return (
-              <li key={index}>
+              <li key={index} className="w-full md:w-[22%] lg:w-full">
                 <NavLink
                   to={value.route}
                   className={({ isActive }) => {

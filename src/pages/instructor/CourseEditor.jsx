@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import { courseService } from "../../services/courseService";
 import { lessonService } from "../../services/lessonService";
 import { toast } from "react-toastify";
 import { validateForm } from "../../../helper/validateForm";
-import { useNavigate, useParams } from "react-router-dom";
-import { FaPlus } from "react-icons/fa6";
 import ReactPlayer from "react-player";
 import axios from "axios";
+import { FaPlus } from "react-icons/fa6";
 import { IoCloudUploadOutline } from "react-icons/io5";
 
 const CourseEditor = () => {
@@ -23,7 +23,7 @@ const CourseEditor = () => {
     level: "",
     image: null,
     thumbnail: null,
-    price: "",
+    price: null,
   });
   const [preview, setPreview] = useState({
     imagePreview: null,
@@ -61,23 +61,6 @@ const CourseEditor = () => {
       errorDuration: "",
     },
   ]);
-
-  // const handlePreview = ({ e, setPreview }) => {
-  //   const allowedTypes = ["jpg", "png", "jpeg"];
-  //   const image = e.target.files[0];
-  //   const type = image?.name?.split(".")[1];
-  //   if (!allowedTypes.includes(type)) {
-  //     setError((prev) => ({
-  //       ...prev,
-  //       errorFile: "Định dạng ảnh không hợp lệ!",
-  //     }));
-  //     return;
-  //   } else {
-  //     const previewUrl = URL.createObjectURL(image);
-  //     setPreview(previewUrl);
-  //     setError((prev) => ({ ...prev, errorFile: "" }));
-  //   }
-  // };
   const handleValidateFile = ({ e, errorField }) => {
     const allowedTypes = ["jpg", "png", "jpeg"];
     const image = e.target.files[0];
@@ -330,7 +313,7 @@ const CourseEditor = () => {
 
   return (
     <>
-      <div className="py-8">
+      <div className="w-[100%] px-6 md:px-8 py-8">
         <div className="flex flex-col gap-y-1">
           <p className="text-display-sm text-surface-nav font-bold">
             {id ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}
@@ -355,7 +338,7 @@ const CourseEditor = () => {
                 Tên khóa học *
               </label>
               <input
-                className="p-2 bg-surface-bg rounded-[8px]"
+                className="p-2 bg-surface-bg rounded-[8px] truncate"
                 value={courseInfo.courseName}
                 onChange={(e) => {
                   handleSetCourseInfo({
@@ -399,15 +382,15 @@ const CourseEditor = () => {
                   {error.errorDescription}
                 </span>
               )}
-              <div className="flex justify-between w-[35%]">
-                <div className="flex flex-col gap-y-1">
+              <div className="flex flex-col gap-y-2 w-full md:flex-row md:justify-between md:w-[65%]">
+                <div className="flex flex-col gap-y-2">
                   <label
                     className="text-surface-nav text-body-lg font-medium"
                     htmlFor="category"
                   >
                     Danh mục *
                   </label>
-                  <div className="flex flex-col gap-y-1">
+                  <div className="flex flex-col gap-y-2">
                     <select
                       className="p-2 bg-surface-white border-1 border-surface-bg rounded-[8px] text-nav-muted outline-none"
                       value={courseInfo.category_id}
@@ -437,14 +420,14 @@ const CourseEditor = () => {
                     </span>
                   </div>
                 </div>
-                <div className="flex flex-col gap-y-1">
+                <div className="flex flex-col gap-y-2">
                   <label
                     className="text-surface-nav text-body-lg font-medium"
                     htmlFor="level"
                   >
                     Cấp độ *
                   </label>
-                  <div className="flex flex-col gap-y-1">
+                  <div className="flex flex-col gap-y-2">
                     <select
                       className="p-2 bg-surface-white border-1 border-surface-bg rounded-[8px] text-nav-muted outline-none"
                       value={courseInfo.level}
@@ -478,11 +461,11 @@ const CourseEditor = () => {
               >
                 Ảnh khóa học *
               </label>
-              <div className="flex flex-col gap-y-2 w-[45%]">
+              <div className="flex flex-col gap-y-2 w-full md:w-[45%]">
                 {preview.imagePreview || courseInfo.image ? (
                   <div className="relative">
                     <img
-                      className="rounded-[16px] opacity-80 w-[150px]"
+                      className="rounded-[16px] opacity-80 w-full md:w-[150px] h-[150px]"
                       src={preview.imagePreview || courseInfo.image}
                       alt=""
                     />
@@ -520,7 +503,7 @@ const CourseEditor = () => {
                     />
                   </div>
                 )}
-                <span className="text-body-md text-red-500 font-medium">
+                <span className="text-body-md text-red-500">
                   {error.errorImage}
                 </span>
               </div>
@@ -530,11 +513,11 @@ const CourseEditor = () => {
               >
                 Ảnh bìa *
               </label>
-              <div className="flex flex-col gap-y-2 w-[45%]">
+              <div className="flex flex-col gap-y-2 w-full md:w-[45%]">
                 {preview.thumbnailPreview || courseInfo.thumbnail ? (
                   <div className="relative">
                     <img
-                      className="rounded-[16px] opacity-80 w-[200px]"
+                      className="rounded-[16px] opacity-80 w-full md:w-[200px] h-[200px]"
                       src={preview.thumbnailPreview || courseInfo.thumbnail}
                       alt=""
                     />
@@ -575,7 +558,7 @@ const CourseEditor = () => {
                     />
                   </div>
                 )}
-                <span className="text-body-md text-red-500 font-medium">
+                <span className="text-body-md text-red-500">
                   {error.errorThumbnail}
                 </span>
               </div>
@@ -587,16 +570,16 @@ const CourseEditor = () => {
               Yêu cầu & Kết quả đạt được
             </p>
             <div className="flex flex-col gap-y-2">
-              <div className="flex flex-col gap-y-1">
+              <div className="flex flex-col gap-y-2">
                 <p className="text-surface-nav text-body-lg font-medium">
                   Yêu cầu trước khi học
                 </p>
                 <p className="text-nav-muted text-body-lg">
                   Những kỹ năng cần có trước khi tham gia khóa học
                 </p>
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-y-3 md:flex-row md:justify-between">
                   <input
-                    className="p-2 w-[88%] bg-surface-bg rounded-[8px]"
+                    className="p-2 w-full md:w-[80%] bg-surface-bg rounded-[8px] truncate"
                     value={requirementContent}
                     onChange={(e) => {
                       setRequirementContent(e.target.value);
@@ -657,7 +640,7 @@ const CourseEditor = () => {
                   )}
                 </ul>
               </div>
-              <div className="flex flex-col gap-y-1">
+              <div className="flex flex-col gap-y-2">
                 <p className="text-surface-nav text-body-lg font-medium">
                   Kết quả đạt được sau khóa học
                 </p>
@@ -665,9 +648,9 @@ const CourseEditor = () => {
                   Những kỹ năng hoặc kiến thức mà học viên sẽ có được sau khi
                   hoàn thành khóa học
                 </p>
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-y-3 md:flex-row md:justify-between">
                   <input
-                    className="p-2 w-[88%] bg-surface-bg rounded-[8px]"
+                    className="p-2 w-full md:w-[80%] bg-surface-bg rounded-[8px] truncate"
                     value={objectiveContent}
                     onChange={(e) => {
                       setObjectiveContent(e.target.value);
@@ -755,7 +738,7 @@ const CourseEditor = () => {
                         </button>
                       )}
                     </div>
-                    <div className="flex flex-col gap-y-1">
+                    <div className="flex flex-col gap-y-2">
                       <label
                         className="text-surface-nav text-body-lg font-medium"
                         htmlFor="lessonName"
@@ -763,7 +746,7 @@ const CourseEditor = () => {
                         Tiêu đề bài học *
                       </label>
                       <input
-                        className="p-2 bg-surface-bg rounded-[8px] w-full"
+                        className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
                         value={value.lessonName}
                         onChange={(e) => {
                           handleSetLesson({
@@ -793,7 +776,7 @@ const CourseEditor = () => {
                         Link video
                       </label>
                       <input
-                        className="p-2 bg-surface-bg rounded-[8px] w-full"
+                        className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
                         value={value.videoUrl}
                         onChange={async (e) => {
                           handleSetLesson({
@@ -858,7 +841,7 @@ const CourseEditor = () => {
                         Thời lượng
                       </label>
                       <input
-                        className="p-2 bg-surface-bg rounded-[8px] w-full"
+                        className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
                         value={value.duration}
                         type="text"
                         disabled
@@ -881,7 +864,7 @@ const CourseEditor = () => {
                     { lessonName: "", videoUrl: "", duration: "", order: 0 },
                   ]);
                 }}
-                className="w-[18%] flex items-center gap-x-4 p-2  bg-surface-nav rounded-[8px] text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                className="w-full md:w-[25%] flex justify-center items-center gap-x-4 p-2  bg-surface-nav rounded-[8px] text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
               >
                 <FaPlus />
                 Thêm bài học

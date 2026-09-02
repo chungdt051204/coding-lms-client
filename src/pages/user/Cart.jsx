@@ -1,22 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Navbar } from "../../components/Navbar";
 import { cartItemService } from "../../services/cartItemService";
 import {
   deleteCartItem,
   deleteCartItemsSelected,
 } from "../../stores/features/cartSlice";
 import { toast } from "react-toastify";
+import { format } from "../../../helper/format";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FiUser } from "react-icons/fi";
 import { MdOutlineEmail } from "react-icons/md";
-import logoZalo from "../../assets/zalo-pay-logo.png";
 import { FaCheck } from "react-icons/fa6";
 import { orderService } from "../../services/orderService";
 import { LuInbox } from "react-icons/lu";
-import { format } from "../../../helper/format";
+import logoZalo from "../../assets/zalo-pay-logo.png";
+import { Navbar } from "../../components/Navbar";
 import Footer from "../../components/Footer";
+
 const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -149,7 +150,7 @@ const Cart = () => {
   return (
     <>
       <Navbar />
-      <div className="py-24 px-32">
+      <div className="py-24 px-8 md:px-16 xl:px-32 h-auto">
         <div className="flex flex-col gap-y-1">
           <p className="text-display-sm text-surface-nav font-bold">Giỏ hàng</p>
           <p className="text-body-lg text-nav-muted">
@@ -157,7 +158,7 @@ const Cart = () => {
           </p>
         </div>
         {myCart?.items?.length == 0 ? (
-          <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
+          <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6 h-[100vh]">
             <LuInbox className="text-display-md text-gray-300" />
             <p>Giỏ hàng của bạn hiện tại đang trống</p>
           </div>
@@ -191,7 +192,7 @@ const Cart = () => {
                 return (
                   <div
                     key={value?._id}
-                    className={`flex justify-between items-center ${
+                    className={`flex flex-col items-end gap-y-2 md:flex-row md:justify-between md:items-center ${
                       cartItemIds?.includes(value._id)
                         ? "border-2 border-brand-blue"
                         : "border border-gray-300"
@@ -219,7 +220,7 @@ const Cart = () => {
                         <p className="text-headline-md text-brand-blue">
                           {value?.course_id?.course_name}
                         </p>
-                        <div className="flex gap-x-8 text-body-lg">
+                        <div className="flex flex-col md:flex-row md:gap-x-8 text-body-lg">
                           <div className="flex flex-col gap-y-1">
                             <div className="flex gap-x-1">
                               <input
@@ -294,12 +295,12 @@ const Cart = () => {
                 );
               })}
             </div>
-            <div className="flex justify-between items-center p-5 border border-gray-300 rounded-[16px] mt-5">
-              <div className="flex flex-col gap-y-1">
+            <div className="flex flex-col gap-y-4 md:flex-row md:justify-between md:items-center p-5 border border-gray-300 rounded-[16px] mt-5">
+              <div className="flex justify-between items-center md:flex-col md:gap-y-1">
                 <p className="text-body-lg text-nav-muted">
                   Đã chọn {cartItemIds?.length} khóa học
                 </p>
-                <p className="text-headline-md text-brand-blue font-bold">
+                <p className="text-headline-sm md:text-headline-md text-brand-blue font-bold">
                   Tổng: {format.formatPrice({ price: appliedAmount() })}đ
                 </p>
               </div>
@@ -319,7 +320,7 @@ const Cart = () => {
         )}
       </div>
       <dialog
-        className="w-[45%] h-[100vh] mx-auto mt-6 p-6 rounded-[16px]"
+        className="w-full lg:w-[45%] mx-auto mt-6 p-6 rounded-[16px]"
         ref={dialogRef}
       >
         <form onSubmit={handleCheckout} className="flex flex-col gap-y-4">
@@ -385,7 +386,13 @@ const Cart = () => {
                       </div>
                     </div>
                     <p className="text-title-lg text-brand-blue font-bold">
-                      {format.formatPrice({ price: value?.course_id?.price })}đ
+                      {format.formatPrice({
+                        price:
+                          paymentOptions[value._id] == "PARTIAL"
+                            ? getHaftPrice({ price: value?.course_id?.price })
+                            : value?.course_id?.price,
+                      })}
+                      đ
                     </p>
                   </div>
                 );
@@ -423,17 +430,17 @@ const Cart = () => {
               </p>
             </div>
           </div>
-          <div className="flex justify-between items-center mt-2 text-title-sm font-medium">
+          <div className="flex flex-col gap-y-4 md:flex-row md:justify-between md:items-center mt-2 text-title-sm font-medium">
             <button
               onClick={() => dialogRef?.current?.close()}
               type="button"
-              className="w-[48%] py-1 border border-gray-300 bg-surface-white rounded-[8px] transition-transform duration-300 hover:bg-surface-bg hover:cursor-pointer"
+              className="w-full md:w-[48%] py-2 border border-gray-300 bg-surface-white rounded-[8px] transition-transform duration-300 hover:bg-surface-bg hover:cursor-pointer"
             >
               Hủy
             </button>
             <button
               disabled={loading}
-              className="flex justify-evenly items-center w-[48%] py-2 bg-surface-nav rounded-[8px] text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+              className="flex justify-evenly items-center w-full md:w-[48%] py-2 bg-surface-nav rounded-[8px] text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
             >
               {!loading && <FaCheck />}
               <p>{loading ? "Đang xử lý..." : "Xác nhận thanh toán"}</p>

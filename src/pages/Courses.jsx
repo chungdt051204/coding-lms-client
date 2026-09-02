@@ -1,13 +1,13 @@
 import { useSearchParams } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { courseService } from "../services/courseService";
 import { setCourses } from "../stores/features/courseSlice";
+import { IoSearch } from "react-icons/io5";
+import Select from "react-select";
+import Navbar from "../components/Navbar";
 import ListCourses from "../components/ListCourses";
 import PaginationButton from "../components/PaginationButton";
-import Select from "react-select";
-import { IoSearch } from "react-icons/io5";
 import Footer from "../components/Footer";
 
 const Courses = () => {
@@ -17,7 +17,6 @@ const Courses = () => {
   const { items: categories } = useSelector((state) => state.categories);
   const { items: courses, isLoading } = useSelector((state) => state.courses);
   const [searchValue, setSearchValue] = useState("");
-
   let categoryOptions = [
     {
       label: "Tất cả danh mục",
@@ -99,17 +98,19 @@ const Courses = () => {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col gap-y-8 px-40 py-24">
-        <div className="flex flex-col gap-y-2 justify-between">
-          <p className="text-display-sm text-surface-nav font-bold">
+      <div className="flex flex-col gap-y-6 md:gap-y-8 px-4 sm:px-8 md:px-16 xl:px-40 py-24">
+        {/* Header Section */}
+        <div className="flex flex-col gap-y-1 sm:gap-y-2">
+          <p className="text-headline-md sm:text-display-sm text-surface-nav font-bold">
             Khám phá khóa học
           </p>
-          <p className="text-title-lg text-nav-muted">
+          <p className="text-body-md sm:text-title-lg text-nav-muted">
             Tìm khóa học phù hợp với bạn
           </p>
         </div>
-        <div className="flex gap-x-6 px-6 py-6 border border-gray-300 rounded-[8px]">
-          <div className="relative w-[65%] ">
+        {/* Filter & Search Bar */}
+        <div className="flex flex-col lg:flex-row gap-4 xl:gap-x-6 p-4 md:p-6 border border-gray-300 rounded-[8px] bg-surface-white">
+          <div className="relative w-full lg:w-[55%]">
             <div className="flex gap-x-2 items-center py-2 px-4 bg-surface-bg rounded-[8px]">
               <IoSearch
                 onClick={() => {
@@ -124,12 +125,12 @@ const Courses = () => {
                     return newParams;
                   });
                 }}
-                className="text-headline-sm text-nav-muted font-medium"
+                className="text-title-lg sm:text-headline-sm text-nav-muted font-medium hover:cursor-pointer shrink-0"
               />
               <input
                 type="text"
                 value={searchValue}
-                className="w-full outline-0"
+                className="w-full bg-transparent outline-0 text-body-md sm:text-body-lg text-surface-nav placeholder:text-nav-muted"
                 placeholder="Nhập tên khóa học, danh mục, giảng viên"
                 onChange={(e) => {
                   setSearchValue(e.target.value);
@@ -138,35 +139,43 @@ const Courses = () => {
               />
             </div>
             {error && (
-              <span className="text-body-md text-red-500">{error}</span>
+              <span className="text-caption sm:text-body-md text-red-500 mt-1 block">
+                {error}
+              </span>
             )}
           </div>
-          <Select
-            onChange={setCategory}
-            defaultValue={categoryOptions[0]}
-            className="w-[25%] text-title-sm text-nav-muted font-medium"
-            options={categoryOptions}
-          />
-          <Select
-            onChange={setLevel}
-            defaultValue={levels[0]}
-            className="w-[22%] text-title-sm text-nav-muted font-medium"
-            options={levels}
-          />
+          {/* Filter Dropdowns */}
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full lg:w-[45%]">
+            <Select
+              onChange={setCategory}
+              defaultValue={categoryOptions[0]}
+              className="w-full lg:w-[65%] text-title-sm text-nav-muted font-medium"
+              options={categoryOptions}
+            />
+            <Select
+              onChange={setLevel}
+              defaultValue={levels[0]}
+              className="w-full lg:w-[65%] text-title-sm text-nav-muted font-medium"
+              options={levels}
+            />
+          </div>
         </div>
+        {/* Course List & Sort Section */}
         <div className="flex flex-col gap-y-6">
-          <div className="flex justify-between">
-            <p className="text-headline-sm text-surface-nav font-medium">
-              Hiển thị {courses?.arrayCourse?.length} khóa học
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-y-3 sm:gap-y-0">
+            <p className="text-body-md sm:text-headline-sm text-surface-nav font-medium">
+              Hiển thị {courses?.arrayCourse?.length || 0} khóa học
             </p>
             <Select
               onChange={setOption}
               defaultValue={options[0]}
-              className="w-[25%] text-title-sm text-nav-muted font-medium"
+              className="w-full sm:w-[40%] md:w-[30%] lg:w-[25%] text-title-sm text-nav-muted font-medium"
               options={options}
             />
           </div>
-          <ListCourses courses={courses} isLoading={isLoading} />
+          <div className="w-full">
+            <ListCourses courses={courses} isLoading={isLoading} />
+          </div>
           {courses?.totalPages > 1 && (
             <PaginationButton totalPages={courses?.totalPages} />
           )}

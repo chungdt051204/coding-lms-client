@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { statisticsService } from "../../services/statisticsService";
+import { format } from "../../../helper/format";
 import { IoBookOutline } from "react-icons/io5";
 import { RxPeople } from "react-icons/rx";
 import { FiDollarSign } from "react-icons/fi";
-import { format } from "../../../helper/format";
-import BarChart from "../../components/BarChart";
 import { LuInbox } from "react-icons/lu";
 import { FaStar } from "react-icons/fa";
 import { BsCreditCard } from "react-icons/bs";
+import BarChart from "../../components/BarChart";
 import MultiAxisLineChart from "../../components/MultiAxisLineChart";
 
 const InstructorDashboard = () => {
@@ -51,9 +51,9 @@ const InstructorDashboard = () => {
 
   return (
     <>
-      <div className="flex flex-col w-[95%] gap-y-10 py-10">
+      <div className="flex flex-col gap-y-10 py-10 px-6 md:px-8">
         <div className="flex flex-wrap gap-4">
-          <div className="flex gap-x-4 items-center border border-gray-300 rounded-[16px] p-5 w-[32%] shadow-md">
+          <div className="flex gap-x-4 items-center border border-gray-300 rounded-[16px] p-5 w-full md:w-[48%] lg:w-[32%] shadow-md">
             <div className="bg-blue-50 rounded-[8px] p-2">
               <IoBookOutline className="text-headline-md text-blue-600" />
             </div>
@@ -67,7 +67,7 @@ const InstructorDashboard = () => {
               <p className="text-title-sm text-nav-muted">Khóa học</p>
             </div>
           </div>
-          <div className="flex gap-x-4 items-center border border-gray-300 rounded-[16px] p-5 w-[32%] shadow-md">
+          <div className="flex gap-x-4 items-center border border-gray-300 rounded-[16px] p-5 w-full md:w-[48%] lg:w-[32%] shadow-md">
             <div className="bg-green-50 rounded-[8px] p-2">
               <RxPeople className="text-headline-md text-green-600" />
             </div>
@@ -81,7 +81,7 @@ const InstructorDashboard = () => {
               <p className="text-title-sm text-nav-muted">Học viên</p>
             </div>
           </div>
-          <div className="flex gap-x-4 items-center border border-gray-300 rounded-[16px] p-5 w-[32%] shadow-md">
+          <div className="flex gap-x-4 items-center border border-gray-300 rounded-[16px] p-5 w-full md:w-[48%] lg:w-[32%] shadow-md">
             <div className="bg-red-50 rounded-[8px] p-2">
               <FiDollarSign className="text-headline-md text-red-500" />
             </div>
@@ -95,7 +95,7 @@ const InstructorDashboard = () => {
               <p className="text-title-sm text-nav-muted">Doanh thu</p>
             </div>
           </div>
-          <div className="flex gap-x-4 items-center border border-gray-300 rounded-[16px] p-5 w-[32%] shadow-md">
+          <div className="flex gap-x-4 items-center border border-gray-300 rounded-[16px] p-5 w-full md:w-[48%] lg:w-[32%] shadow-md">
             <div className="bg-red-50 rounded-[8px] p-2">
               <BsCreditCard className="text-headline-md text-orange-500" />
             </div>
@@ -110,32 +110,52 @@ const InstructorDashboard = () => {
             </div>
           </div>
         </div>
-        {(statistics?.monthlyRevenueAndProfit?.length > 0 ||
-          statistics?.courseRevenueStats?.length > 0) && (
-          <div className="p-5 border border-gray-200 rounded-[16px]">
-            <MultiAxisLineChart
-              text="Biểu đồ thống kê tổng doanh thu (100%) và lợi nhuận thu được (80%) trong tháng"
-              labels={days}
-              label1="Tổng doanh thu (100%)"
-              data1={revenues}
-              label2="Lợi nhuận thu được (80%)"
-              data2={profits}
-            />
-            <BarChart
-              text="Biểu đồ thống kê doanh thu từng khóa học (100%)"
-              labels={courseNames}
-              label1="Tổng doanh thu (100%)"
-              data1={courseRevenues}
-            />
+        <div className="flex flex-col gap-y-6 p-5 border border-gray-200 rounded-[16px]">
+          <div className="flex flex-col gap-y-4">
+            <p className="text-title-sm text-surface-nav font-medium">
+              Biểu đồ thống kê doanh thu (100%) và lợi nhuận (80%) thu được
+              trong tháng
+            </p>
+            {statistics?.monthlyRevenueAndProfit?.length > 0 ? (
+              <MultiAxisLineChart
+                labels={days}
+                label1="Tổng doanh thu (100%)"
+                data1={revenues}
+                label2="Lợi nhuận thu được (80%)"
+                data2={profits}
+              />
+            ) : (
+              <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted">
+                <LuInbox className="text-display-md text-gray-300" />
+                <p>Chưa có dữ liệu</p>
+              </div>
+            )}
           </div>
-        )}
+          <div className="flex flex-col gap-y-4">
+            <p className="text-title-sm text-surface-nav font-medium">
+              Biểu đồ thống kê doanh thu (100%) của từng khóa học
+            </p>
+            {statistics?.courseRevenueStats?.length > 0 ? (
+              <BarChart
+                labels={courseNames}
+                label1="Tổng doanh thu (100%)"
+                data1={courseRevenues}
+              />
+            ) : (
+              <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted">
+                <LuInbox className="text-display-md text-gray-300" />
+                <p>Chưa có dữ liệu</p>
+              </div>
+            )}
+          </div>
+        </div>
         <div className="flex flex-col gap-y-6">
           <div className="flex flex-col gap-y-4 border py-6 border-gray-200 rounded-[16px] mt-6">
             <p className="text-title-lg text-surface-nav font-medium px-6">
               Top các khóa học được đánh giá cao nhất
             </p>
             {statistics?.top5HighRatingCourses?.length == 0 ? (
-              <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted w-[95%] mt-6">
+              <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted">
                 <LuInbox className="text-display-md text-gray-300" />
                 <p>Chưa có dữ liệu</p>
               </div>

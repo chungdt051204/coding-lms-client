@@ -1,37 +1,36 @@
+import { useEffect, useState } from "react";
 import { Routes, Route, useSearchParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
-import LandingPage from "./pages/LandingPage";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import InstructorDashboard from "./pages/instructor/Dashboard";
-import { useEffect, useState } from "react";
 import { userService } from "./services/userService";
 import { setIsLogin } from "./stores/features/authSlice";
 import { setMe } from "./stores/features/meSlice";
-
-import InstructorCourses from "./pages/instructor/Courses";
-import ProtectedRouteInstructor from "./pages/instructor/ProtectedRoute";
 import { roleService } from "./services/roleService";
 import { setRoles } from "./stores/features/roleSlice";
 import { setCategories } from "./stores/features/categorySlice";
 import { categoryService } from "./services/categoryService";
+import { cartService } from "./services/cartService";
+import { setCart } from "./stores/features/cartSlice";
+import { notificationService } from "./services/notificationService";
+import { setNotifications } from "./stores/features/notificationSlice";
+import { socket } from "../socket";
+import LandingPage from "./pages/LandingPage";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import InstructorDashboard from "./pages/instructor/Dashboard";
+import InstructorCourses from "./pages/instructor/Courses";
+import ProtectedRouteInstructor from "./pages/instructor/ProtectedRoute";
 import CourseEditor from "./pages/instructor/CourseEditor";
 import InstructorPage from "./pages/instructor/InstructorPage";
 import Tests from "./pages/instructor/Tests";
 import TestEditor from "./pages/instructor/TestEditor";
 import Students from "./pages/instructor/Students";
-
 import ProtectedRouteAdmin from "./pages/admin/ProtectedRoute";
 import AdminPage from "./pages/admin/AdminPage";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminCourses from "./pages/admin/Courses";
 import CourseDetail from "./pages/CourseDetail";
 import LessonDetail from "./pages/LessonDetail";
-import { cartService } from "./services/cartService";
-import { setCart } from "./stores/features/cartSlice";
-import { notificationService } from "./services/notificationService";
-import { setNotifications } from "./stores/features/notificationSlice";
 import Cart from "./pages/user/Cart";
 import Notifications from "./pages/Notifications";
 import MyCourses from "./pages/user/MyCourses";
@@ -47,10 +46,8 @@ import MyProfile from "./pages/MyProfile";
 import Courses from "./pages/Courses";
 import Comments from "./pages/admin/Comments";
 import Orders from "./pages/admin/Orders";
-import { socket } from "../socket";
 import StudentDetail from "./pages/instructor/StudentDetail";
 
-export const api = "https://lms-server-2xk1.onrender.com";
 function App() {
   const navigate = useNavigate();
   const isLogin = useSelector((state) => state.auth.isLogin);
@@ -181,9 +178,9 @@ function App() {
         <Route path="/my-courses" element={<MyCourses />} />
         <Route path="/my-orders" element={<MyOrders />} />
         <Route path="/order/:id" element={<OrderDetail />} />
+
         <Route element={<ProtectedRouteInstructor />}>
           <Route path="/instructor" element={<InstructorPage />}>
-            <Route path="dashboard" element={<InstructorDashboard />} />
             <Route path="dashboard" element={<InstructorDashboard />} />
             <Route path="courses" element={<InstructorCourses />} />
             <Route path="course/add" element={<CourseEditor />} />
@@ -196,6 +193,7 @@ function App() {
             <Route path="comments" element={<Comments />} />
           </Route>
         </Route>
+
         <Route element={<ProtectedRouteAdmin />}>
           <Route path="/admin" element={<AdminPage />}>
             <Route path="dashboard" element={<AdminDashboard />} />

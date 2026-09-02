@@ -1,17 +1,17 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { courseService } from "../../services/courseService";
-import { RxPeople } from "react-icons/rx";
 import { toast } from "react-toastify";
+import { socket } from "../../../socket";
+import { RxPeople } from "react-icons/rx";
 import { IoListOutline } from "react-icons/io5";
 import { GoClock } from "react-icons/go";
 import { CiCircleCheck } from "react-icons/ci";
 import { LuInbox } from "react-icons/lu";
-import PaginationButton from "../../components/PaginationButton";
 import { IoEyeOutline } from "react-icons/io5";
-import ConfirmDialog from "../../components/ConfirmDialog";
 import { IoBan } from "react-icons/io5";
-import { socket } from "../../../socket";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import PaginationButton from "../../components/PaginationButton";
 
 const AdminCourses = () => {
   const navigate = useNavigate();
@@ -107,6 +107,8 @@ const AdminCourses = () => {
       });
       toast.success(result.message || "Từ chối khóa học thành công");
       rejectDialog?.current?.close();
+      setIsRejected(false);
+      setReason("");
       setRefresh((prev) => prev + 1);
     } catch (error) {
       const status = error.status;
@@ -116,7 +118,7 @@ const AdminCourses = () => {
   };
   return (
     <>
-      <div className="w-[100%] py-8">
+      <div className="w-[100%] px-6 md:px-8 py-8">
         <div className="h-[70px] flex flex-col justify-between">
           <p className="text-display-sm text-surface-nav font-bold">
             Quản lý khóa học
@@ -125,7 +127,7 @@ const AdminCourses = () => {
             Phê duyệt khóa học của giảng viên
           </p>
         </div>
-        <div className="flex mt-6 border border-gray-300 rounded-[8px] w-[95%]">
+        <div className="flex mt-6 border border-gray-300 rounded-[8px] overflow-x-auto scroll-smooth">
           {filterTabs?.map((value, index) => {
             const borderBottomColors = [
               "border-b-2 border-b-blue-600",
@@ -141,7 +143,7 @@ const AdminCourses = () => {
             ];
             return (
               <div
-                className={`flex py-4 ${
+                className={`flex justify-center sm:justify-start py-4 shrink-0 sm:w-auto hover:cursor-pointer ${
                   idx == index && borderBottomColors[index]
                 }`}
                 onClick={() => {
@@ -151,7 +153,7 @@ const AdminCourses = () => {
                 key={index}
               >
                 <div
-                  className={`flex gap-x-2 items-center px-6 text-title-sm font-medium ${
+                  className={`flex gap-x-2 items-center px-3 sm:px-6 text-title-sm font-medium ${
                     idx == index ? textColors[index] : "text-nav-muted"
                   }`}
                 >
@@ -162,78 +164,201 @@ const AdminCourses = () => {
             );
           })}
         </div>
-        <div className="flex flex-col gap-y-6 w-[95%]">
+        <div className="flex flex-col gap-y-6">
           {isLoading ? (
-            <p className="text-title-lg text-surface-nav text-center">
-              Đang tải dữ liệu...
-            </p>
+            <p>Đang tải dữ liệu...</p>
           ) : courses?.arrayCourse?.length == 0 ? (
-            <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted w-[95%] mt-6">
+            <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
               <LuInbox className="text-display-md text-gray-300" />
               <p>Chưa có khóa học nào</p>
             </div>
           ) : (
-            <table className="border-separate border-spacing-0 overflow-hidden border-1 border-surface-bg rounded-[16px] mt-6">
-              <thead>
-                <tr className="flex items-center justify-between text-surface-nav font-medium">
-                  <td className="w-[35%] p-2">Khóa học</td>
-                  <td className="w-[20%]">Giảng viên</td>
-                  <td className="w-[16%]">Học viên</td>
-                  <td className="w-[9%]">Trạng thái</td>
-                  <td className="w-[20%] p-2 text-right">Thao tác</td>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              <div className="hidden xl:block w-full">
+                <table className="w-full border-separate border-spacing-0 overflow-hidden border border-surface-bg rounded-[16px] mt-6">
+                  <thead>
+                    <tr className="flex items-center justify-between text-surface-nav font-medium">
+                      <td className="w-[35%] p-2">Khóa học</td>
+                      <td className="w-[20%]">Giảng viên</td>
+                      <td className="w-[16%]">Học viên</td>
+                      <td className="w-[9%]">Trạng thái</td>
+                      <td className="w-[20%] p-2 text-right">Thao tác</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {courses?.arrayCourse?.length > 0 ? (
+                      courses?.arrayCourse?.map((value) => {
+                        return (
+                          <tr
+                            className="flex justify-between items-center border-t border-surface-bg hover:bg-surface-bg"
+                            key={value?.course._id}
+                          >
+                            <td className="flex items-center gap-x-2 w-[35%] p-2">
+                              <img
+                                src={value?.course.image_url}
+                                width={50}
+                                height={50}
+                                className="rounded-[8px] object-cover"
+                                alt=""
+                              />
+                              <div>
+                                <p className="text-surface-nav text-title-lg font-medium">
+                                  {value?.course.course_name}
+                                </p>
+                                <p className="text-nav-muted text-body-lg">
+                                  {value?.course.category_id.category_name}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="w-[20%] text-title-sm text-surface-nav font-medium">
+                              {value?.course.user_id.full_name}
+                            </td>
+                            <td className="flex gap-x-1 items-center w-[15%] text-title-sm text-surface-nav">
+                              <RxPeople />
+                              <p>{value.numberEnrollment}</p>
+                            </td>
+                            <td className="w-[10%]">
+                              <p
+                                className={`text-body-md text-center font-medium rounded-[8px] py-1 ${
+                                  value?.course.status === "pending"
+                                    ? "text-yellow-700 bg-yellow-100"
+                                    : value?.course.status === "approved"
+                                    ? "text-green-700 bg-green-100"
+                                    : "text-red-700 bg-red-100"
+                                }`}
+                              >
+                                {value?.course.status}
+                              </p>
+                            </td>
+                            <td className="flex justify-end gap-x-2 items-center w-[20%] pe-2">
+                              {value?.course.status === "pending" && (
+                                <div className="flex items-center gap-x-2">
+                                  <button
+                                    onClick={() => {
+                                      const courseId = value?.course?._id;
+                                      const item = courses?.arrayCourse?.find(
+                                        (v) => v?.course?._id === courseId
+                                      );
+                                      setIsApproved(true);
+                                      setCourse(item?.course);
+                                      setMessage(
+                                        "Bạn có muốn duyệt khóa học này không ?"
+                                      );
+                                      confirmDialog?.current?.showModal();
+                                    }}
+                                    className="px-2 py-1 bg-green-700 text-body-lg text-surface-white rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                                  >
+                                    Duyệt
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      const courseId = value?.course?._id;
+                                      const item = courses?.arrayCourse?.find(
+                                        (v) => v?.course?._id === courseId
+                                      );
+                                      setIsApproved(false);
+                                      setIsRejected(true);
+                                      setCourse(item?.course);
+                                      setMessage(
+                                        "Bạn có muốn từ chối khóa học này không ?"
+                                      );
+                                      confirmDialog?.current?.showModal();
+                                    }}
+                                    className="px-2 py-1 bg-brand-primary text-body-lg text-surface-white rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                                  >
+                                    Từ chối
+                                  </button>
+                                </div>
+                              )}
+                              <IoEyeOutline
+                                className="hover:cursor-pointer text-title-lg"
+                                onClick={() =>
+                                  navigate(`/course/${value?.course._id}`)
+                                }
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          className="text-center py-6 text-nav-muted"
+                        >
+                          Chưa có khóa học nào
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex flex-col gap-4 mt-6 xl:hidden w-full">
                 {courses?.arrayCourse?.length > 0 ? (
                   courses?.arrayCourse?.map((value) => {
                     return (
-                      <tr
-                        className="flex justify-between items-center border border-surface-bg hover:bg-surface-bg"
+                      <div
                         key={value?.course._id}
+                        className="flex flex-col gap-y-3 p-4 border border-surface-bg rounded-[16px] bg-surface-white shadow-sm"
                       >
-                        <td className="flex items-center gap-x-2 w-[35%] p-2">
-                          <img
-                            src={value?.course.image_url}
-                            width={50}
-                            height={50}
-                          />
-                          <div>
-                            <p className="text-surface-nav text-title-lg font-medium">
-                              {value?.course.course_name}
-                            </p>
-                            <p className="text-nav-muted text-body-lg">
-                              {value?.course.category_id.category_name}
-                            </p>
+                        <div className="flex justify-between items-start gap-x-3">
+                          <div className="flex gap-x-3 items-center">
+                            <img
+                              src={value?.course.image_url}
+                              className="w-[80px] h-[80px] rounded-[8px] object-contain shrink-0"
+                              alt=""
+                            />
+                            <div>
+                              <p className="text-surface-nav text-title-lg font-medium">
+                                {value?.course.course_name}
+                              </p>
+                              <p className="text-nav-muted text-body-lg">
+                                {value?.course.category_id.category_name}
+                              </p>
+                            </div>
                           </div>
-                        </td>
-                        <td className="w-[20%] text-title-sm text-surface-nav font-medium">
-                          {value?.course.user_id.full_name}
-                        </td>
-                        <td className="flex gap-x-1 items-center w-[15%] text-title-sm text-surface-nav">
-                          <RxPeople />
-                          <p>{value.numberEnrollment}</p>
-                        </td>
-                        <td className="w-[10%]">
-                          <p
-                            className={`text-body-md text-center font-medium rounded-[8px] ${
+
+                          <span
+                            className={`text-body-md font-medium rounded-[8px] px-2 py-1 shrink-0 ${
                               value?.course.status === "pending"
                                 ? "text-yellow-700 bg-yellow-100"
                                 : value?.course.status === "approved"
                                 ? "text-green-700 bg-green-100"
                                 : "text-red-700 bg-red-100"
-                            } `}
+                            }`}
                           >
                             {value?.course.status}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-title-sm text-surface-nav pt-2 border-t border-surface-bg">
+                          <p className="font-medium">
+                            Giang viên:{" "}
+                            <span className="text-nav-muted">
+                              {value?.course.user_id.full_name}
+                            </span>
                           </p>
-                        </td>
-                        <td className="flex justify-end gap-x-2 items-center w-[20%] pe-2">
+                          <div className="flex gap-x-1 items-center">
+                            <RxPeople />
+                            <p>{value.numberEnrollment} học viên</p>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center pt-2 border-t border-surface-bg">
+                          <div
+                            onClick={() =>
+                              navigate(`/course/${value?.course._id}`)
+                            }
+                            className="flex gap-x-1 items-center text-body-lg text-brand-blue hover:cursor-pointer font-medium"
+                          >
+                            <IoEyeOutline />
+                            <span>Xem chi tiết</span>
+                          </div>
                           {value?.course.status === "pending" && (
-                            <div className="flex items-center gap-x-2">
+                            <div className="flex gap-x-2 font-medium">
                               <button
                                 onClick={() => {
                                   const courseId = value?.course?._id;
                                   const item = courses?.arrayCourse?.find(
-                                    (value) => value?.course?._id == courseId
+                                    (v) => v?.course?._id === courseId
                                   );
                                   setIsApproved(true);
                                   setCourse(item?.course);
@@ -242,7 +367,7 @@ const AdminCourses = () => {
                                   );
                                   confirmDialog?.current?.showModal();
                                 }}
-                                className="px-2 py-1 bg-green-700 text-body-lg text-surface-white rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                                className="px-3 py-1 bg-green-700 text-body-lg text-surface-white rounded-[8px] hover:cursor-pointer"
                               >
                                 Duyệt
                               </button>
@@ -250,7 +375,7 @@ const AdminCourses = () => {
                                 onClick={() => {
                                   const courseId = value?.course?._id;
                                   const item = courses?.arrayCourse?.find(
-                                    (value) => value?.course?._id == courseId
+                                    (v) => v?.course?._id === courseId
                                   );
                                   setIsApproved(false);
                                   setIsRejected(true);
@@ -260,28 +385,23 @@ const AdminCourses = () => {
                                   );
                                   confirmDialog?.current?.showModal();
                                 }}
-                                className="px-2 py-1 bg-brand-primary text-body-lg text-surface-white rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                                className="px-3 py-1 bg-brand-primary text-body-lg text-surface-white rounded-[8px] hover:cursor-pointer"
                               >
                                 Từ chối
                               </button>
                             </div>
                           )}
-                          <IoEyeOutline
-                            onClick={() =>
-                              navigate(`/course/${value?.course._id}`)
-                            }
-                          />
-                        </td>
-                      </tr>
+                        </div>
+                      </div>
                     );
                   })
                 ) : (
-                  <tr>
-                    <td colSpan={6}>Chưa có khóa học nào</td>
-                  </tr>
+                  <div className="text-center py-6 text-nav-muted border border-surface-bg rounded-[16px]">
+                    Chưa có khóa học nào
+                  </div>
                 )}
-              </tbody>
-            </table>
+              </div>
+            </>
           )}
           {courses?.totalPages > 1 && (
             <PaginationButton totalPages={courses?.totalPages} />

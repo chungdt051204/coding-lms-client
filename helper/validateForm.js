@@ -184,7 +184,8 @@ export const validateForm = {
       errorDescription: "",
       errorCategory: "",
       errorLevel: "",
-      errorFile: "",
+      errorImage: "",
+      errorThumbnail: "",
       errorRequirement: "",
       errorObjective: "",
       errorPrice: "",
@@ -230,14 +231,18 @@ export const validateForm = {
 
     if (!isEdit) {
       //Kiểm tra ảnh khóa học và ảnh bìa
-      if (!formData.image || !formData.thumbnail) {
-        errors.errorFile = "Vui lòng chọn ảnh!";
+      if (formData.image == null) {
+        errors.errorImage = "Vui lòng chọn ảnh!";
         isValid = false;
-      } else if (
-        formData.image?.size > 300000 ||
-        formData.thumbnail?.size > 300000
-      ) {
-        errors.errorFile = "Kích thước ảnh tối đa 300KB!";
+      } else if (formData.image?.size > 300000) {
+        errors.errorImage = "Kích thước ảnh tối đa 300KB!";
+        isValid = false;
+      }
+      if (formData.thumbnail == null) {
+        errors.errorThumbnail = "Vui lòng chọn ảnh!";
+        isValid = false;
+      } else if (formData.thumbnail?.size > 300000) {
+        errors.errorThumbnail = "Kích thước ảnh tối đa 300KB!";
         isValid = false;
       }
     }
@@ -255,7 +260,7 @@ export const validateForm = {
     }
 
     //Kiểm tra giá
-    if (!formData.price) {
+    if (formData.price == null) {
       errors.errorPrice = "Vui lòng nhập giá!";
       isValid = false;
     } else if (!numberRegex.test(formData.price)) {

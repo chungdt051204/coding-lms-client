@@ -3,16 +3,17 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { testService } from "../services/testService";
 import { questionService } from "../services/questionService";
-import { Progress } from "antd";
-import { toast } from "react-toastify";
 import { testResultService } from "../services/testResultService";
-import Navbar from "../components/Navbar";
+import { toast } from "react-toastify";
+import { Progress } from "antd";
 import { GoClock } from "react-icons/go";
 import { FiFlag } from "react-icons/fi";
 import { CiCircleCheck } from "react-icons/ci";
 import { FaArrowLeft } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa6";
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
 const TestDetail = () => {
   const navigate = useNavigate();
   const { item: me, isLoading } = useSelector((state) => state.me);
@@ -152,13 +153,13 @@ const TestDetail = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-gray-100 py-18">
-        <div className="flex flex-col gap-y-2 py-5 px-24 bg-surface-white">
-          <div className="flex justify-between">
+      <div className="bg-gray-100 py-18 h-[100vh] lg:h-auto">
+        <div className="flex flex-col gap-y-2 py-5 px-8 md:px-16 lg:px-24 bg-surface-white">
+          <div className="flex flex-col gap-y-4 md:flex-row md:justify-between">
             <p className="text-headline-md text-surface-nav font-bold">
               {test?.test_name || ""}
             </p>
-            <div className="flex gap-x-4">
+            <div className="flex gap-x-6">
               <div className="flex gap-x-2 items-center py-2 px-4 rounded-[8px] bg-blue-100 text-headline-sm text-blue-700 font-bold">
                 <GoClock />
                 <p>
@@ -184,7 +185,7 @@ const TestDetail = () => {
           </p>
           <Progress style={{ fontSize: 16 }} percent={currentProgress} />
         </div>
-        <div className="py-6 px-24">
+        <div className="py-6 px-8 md:px-16 lg:px-24">
           <div className="border border-gray-300 rounded-[16px] p-8 bg-surface-white">
             <div className="flex justify-between">
               <p className="text-body-md font-medium text-purple-700 px-3 py-1 bg-purple-100 rounded-[8px]">
@@ -263,36 +264,6 @@ const TestDetail = () => {
                 <FaArrowLeft />
                 <p> Câu trước</p>
               </button>
-              <div className="flex gap-x-2">
-                {questions?.map((value, index) => {
-                  return (
-                    <div
-                      onClick={() => {
-                        if (!clicked) {
-                          toast.warning(
-                            "Vui lòng ấn bắt đầu làm bài kiểm tra!"
-                          );
-                          return;
-                        }
-                        setCurrentIndex(index);
-                      }}
-                      key={index}
-                      className={`px-4 py-2 rounded-[8px] text-title-sm font-medium transition-transform duration-300 hover:cursor-pointer ${
-                        value?.options?.some(
-                          (item) =>
-                            item?._id == selectedOptionIds[value?.question?._id]
-                        )
-                          ? "bg-green-100 text-green-700 hover:bg-green-200"
-                          : currentIndex == index
-                          ? "bg-brand-blue text-surface-white"
-                          : "bg-surface-bg hover:bg-gray-200"
-                      }`}
-                    >
-                      {index + 1}
-                    </div>
-                  );
-                })}
-              </div>
               <button
                 onClick={() => {
                   if (!clicked) {
@@ -315,7 +286,7 @@ const TestDetail = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      {me?.role_id?.role == "user" && <Footer />}
     </>
   );
 };

@@ -1,12 +1,13 @@
 import { useSelector } from "react-redux";
-import { IoChatbubblesOutline } from "react-icons/io5";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { conversationService } from "../services/conversationService";
-import ConversationDetail from "./ConversationDetail";
-import { FaFacebookMessenger } from "react-icons/fa";
 import { socket } from "../../socket";
+import { IoChatbubblesOutline } from "react-icons/io5";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import { FaFacebookMessenger } from "react-icons/fa";
 import { LuInbox } from "react-icons/lu";
+import ConversationDetail from "./ConversationDetail";
+
 const Conversations = ({ me }) => {
   const { items: roles } = useSelector((state) => state.roles);
   const [conversations, setConversations] = useState([]);
@@ -141,6 +142,7 @@ const Conversations = ({ me }) => {
                               className="w-[40px] h-[40px] rounded-[1000px] object-cover"
                               src={value?.item?.user_id?.avatar}
                               alt=""
+                              referrerPolicy="no-referrer"
                             />
                             {value?.unreadMessages > 0 && (
                               <div className="absolute bottom-12 left-7 bg-blue-500 w-[20px] h-[20px] rounded-[1000px] text-center text-surface-white text-body-md">

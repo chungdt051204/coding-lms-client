@@ -5,9 +5,9 @@ import { setCourses } from "../../stores/features/courseSlice";
 import { courseService } from "../../services/courseService";
 import { testService } from "../../services/testService";
 import { questionService } from "../../services/questionService";
-import { updateTest } from "../../stores/features/testSlice";
-import { FaPlus } from "react-icons/fa6";
 import { toast } from "react-toastify";
+import { FaPlus } from "react-icons/fa6";
+
 const TestEditor = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -39,7 +39,32 @@ const TestEditor = () => {
         value.questionContent !== "" &&
         !value.options?.some((item) => item.answerContent == "")
     ) || [];
-  const [error, setError] = useState({ errorTestName: "", errorCourse: "" });
+  const [error, setError] = useState({
+    errorTestName: "",
+    errorCourse: "",
+  });
+  const [errorQuestion, setErrorQuestion] = useState({});
+  const validateQuestion = () => {
+    let isValid = true;
+    questions?.forEach((value, index) => {
+      if (
+        (value?.questionContent?.trim() !== "" &&
+          value?.options?.some((item) => !item?.answerContent)) ||
+        (!value?.questionContent?.trim() &&
+          value?.options?.some((item) => item?.answerContent !== ""))
+      ) {
+        setErrorQuestion((prev) => ({
+          ...prev,
+          [index]: "Vui lòng nhập đầy đủ nội dung câu hỏi!",
+        }));
+        isValid = false;
+      }
+    });
+    return isValid;
+  };
+  useEffect(() => {
+    console.log(errorQuestion);
+  }, [errorQuestion]);
   useEffect(() => {
     if (id) {
       const getTestById = async () => {
@@ -137,8 +162,10 @@ const TestEditor = () => {
         ...prev,
         errorCourse: "Khóa học này đã có bài kiểm tra!",
       }));
-      return;
-    } else {
+    }
+    console.log(validateQuestion());
+    if (validateQuestion() == false) return;
+    else {
       const formData = {
         testName: testInfo.testName,
         courseId: testInfo.courseId,
@@ -149,7 +176,6 @@ const TestEditor = () => {
       if (id) {
         try {
           const result = await testService.updateTest({ testId: id, formData });
-          dispatch(updateTest(result.data));
           toast.success(result.message || "Cập nhật bài kiểm tra thành công");
           navigate("/instructor/tests");
         } catch (error) {
@@ -197,7 +223,7 @@ const TestEditor = () => {
   };
   return (
     <>
-      <div className="py-8">
+      <div className="w-[100%] px-6 md:px-8 py-8">
         <div className="flex flex-col gap-y-1">
           <p className="text-display-sm text-surface-nav font-bold">
             {id ? "Chỉnh sửa thông tin bài kiểm tra" : "Tạo bài kiểm tra mới"}
@@ -219,7 +245,7 @@ const TestEditor = () => {
                 Thiết lập các thông tin cơ bản
               </p>
             </div>
-            <div className="flex flex-col gap-y-1">
+            <div className="flex flex-col gap-y-2">
               <label
                 className="text-body-lg text-surface-nav font-medium"
                 htmlFor="testName"
@@ -244,39 +270,41 @@ const TestEditor = () => {
                   {error.errorTestName}
                 </span>
               )}
-              <label
-                className="text-body-lg text-surface-nav font-medium"
-                htmlFor="course"
-              >
-                Khóa học
-              </label>
-              <select
-                className="p-2 bg-surface-white border-1 border-surface-bg rounded-[8px] text-nav-muted outline-none"
-                onChange={(e) => {
-                  setTestInfo((prev) => ({
-                    ...prev,
-                    courseId: e.target.value,
-                  }));
-                  setError((prev) => ({ ...prev, errorCourse: "" }));
-                }}
-                value={testInfo.courseId}
-              >
-                <option value="">Chọn khóa học</option>
-                {courses?.arrayCourse?.map((value) => {
-                  return (
-                    <option key={value.course._id} value={value.course._id}>
-                      {value.course.course_name}
-                    </option>
-                  );
-                })}
-              </select>
-              {error.errorCourse && (
-                <span className="text-body-md text-red-500">
-                  {error.errorCourse}
-                </span>
-              )}
-              <div className="flex justify-between">
-                <div className="flex flex-col gap-y-1 w-[45%]">
+              <div className="flex flex-col gap-y-2">
+                <label
+                  className="text-body-lg text-surface-nav font-medium"
+                  htmlFor="course"
+                >
+                  Khóa học
+                </label>
+                <select
+                  className="p-2 bg-surface-white border-1 border-surface-bg rounded-[8px] text-nav-muted outline-none"
+                  onChange={(e) => {
+                    setTestInfo((prev) => ({
+                      ...prev,
+                      courseId: e.target.value,
+                    }));
+                    setError((prev) => ({ ...prev, errorCourse: "" }));
+                  }}
+                  value={testInfo.courseId}
+                >
+                  <option value="">Chọn khóa học</option>
+                  {courses?.arrayCourse?.map((value) => {
+                    return (
+                      <option key={value.course._id} value={value.course._id}>
+                        {value.course.course_name}
+                      </option>
+                    );
+                  })}
+                </select>
+                {error.errorCourse && (
+                  <span className="text-body-md text-red-500">
+                    {error.errorCourse}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-col gap-y-2 md:flex-row md:justify-between">
+                <div className="flex flex-col gap-y-2 w-full md:w-[45%]">
                   <label
                     className="text-body-lg text-surface-nav font-medium"
                     htmlFor="durationMinutes"
@@ -302,7 +330,7 @@ const TestEditor = () => {
                     })}
                   </select>
                 </div>
-                <div className="flex flex-col gap-y-1 w-[45%]">
+                <div className="flex flex-col gap-y-2 w-full md:w-[45%]">
                   <label
                     className="text-body-lg text-surface-nav font-medium"
                     htmlFor="passScore"
@@ -333,7 +361,7 @@ const TestEditor = () => {
           </div>
           {/* Câu hỏi */}
           <div className="mt-5">
-            <p className="text-headline-md text-surface-nav font-medium">
+            <p className="text-headline-sm text-surface-nav font-medium">
               Câu hỏi ({questions.length})
             </p>
           </div>
@@ -368,7 +396,7 @@ const TestEditor = () => {
                       placeholder="Nhập nội dung câu hỏi"
                     />
                   </div>
-                  <div className="flex flex-col gap-y-1 text-body-lg text-surface-nav">
+                  <div className="flex flex-col gap-y-2 text-body-lg text-surface-nav">
                     <p className="font-medium">Đáp án (chọn đáp án đúng)</p>
                     <div className="flex flex-col gap-y-2 ">
                       {value.options?.map((_, idx) => {
@@ -402,7 +430,7 @@ const TestEditor = () => {
                                 setQuestions(newQuestions);
                               }}
                               key={index}
-                              className="p-2 bg-surface-bg rounded-[8px] w-full"
+                              className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
                               placeholder={`Đáp án ${options[idx]}`}
                             />
                           </div>
@@ -410,13 +438,18 @@ const TestEditor = () => {
                       })}
                     </div>
                   </div>
+                  {errorQuestion && (
+                    <span className="text-title-sm text-red-500">
+                      {errorQuestion[index]}
+                    </span>
+                  )}
                 </div>
               );
             })}
             <div className="flex justify-end px-5">
               <button
                 type="button"
-                className="w-[18%] flex items-center gap-x-4 p-2 bg-surface-nav text-surface-white text-title-lg rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                className="w-full md:w-[25%] flex justify-center items-center gap-x-4 p-2 bg-surface-nav text-surface-white text-title-lg rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
                 onClick={() =>
                   setQuestions((prev) => [
                     ...prev,

@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { format } from "../../helper/format";
 import { FaStar } from "react-icons/fa";
 import { RxPeople } from "react-icons/rx";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { LuInbox } from "react-icons/lu";
-import { format } from "../../helper/format";
 
 const ListCourses = ({ courses, isLoading }) => {
   const navigate = useNavigate();
@@ -23,12 +23,12 @@ const ListCourses = ({ courses, isLoading }) => {
                 className={`${
                   !isLoading &&
                   "border border-gray-300 rounded-[16px] transition-shadow duration-300 hover:shadow-lg hover:cursor-pointer"
-                } flex flex-col gap-y-4 w-[31%] p-5 `}
+                } flex flex-col gap-y-4 lg:w-[31%] md:w-[48%] w-full p-5 `}
               >
                 {isLoading ? (
                   <Skeleton width={250} height={200} />
                 ) : (
-                  <div className="w-[250px] h-[200px]">
+                  <div className="w-[250px] h-[200px] mx-auto">
                     <img
                       className="w-full h-full object-contain"
                       src={value?.course?.image_url}

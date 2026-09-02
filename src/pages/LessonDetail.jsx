@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { enrollmentService } from "../services/enrollmentService";
 import { useNavigate, useParams } from "react-router-dom";
+import { enrollmentService } from "../services/enrollmentService";
 import { setEnrollments } from "../stores/features/enrollmentSlice";
 import { lessonService } from "../services/lessonService";
 import { lessonProgressService } from "../services/lessonProgressService";
+import ReactPlayer from "react-player";
+import { toast } from "react-toastify";
 import { IoPlayCircleOutline } from "react-icons/io5";
 import { IoIosLock } from "react-icons/io";
-import ReactPlayer from "react-player";
 import { FaCheck } from "react-icons/fa6";
-import { Navbar } from "../components/Navbar";
-import { toast } from "react-toastify";
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { format } from "../../helper/format";
+
 const LessonDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -38,18 +40,6 @@ const LessonDetail = () => {
       ? lessons?.length
       : 0;
   const playerRef = useRef();
-  const secondToTime = (second) => {
-    if (second < 60) return `00:${second}`;
-    if (second >= 60 && second < 3600)
-      return `${Math.floor(second / 60)}:${second % 60}`;
-    if (second >= 3600)
-      return `${Math.floor(second / 3600)}:${Math.floor(
-        (second % 3600) / 60
-      )}:${(second % 3600) % 60}`;
-  };
-  useEffect(() => {
-    console.log(numberAccessLesson);
-  }, [numberAccessLesson]);
   useEffect(() => {
     if (!enrolledCourse && !isLoading && !isAdmin && !isInstructor) {
       navigate("/");
@@ -126,6 +116,7 @@ const LessonDetail = () => {
     const index = lessons?.findIndex((value) => value?._id == id);
     if (
       index < lessons?.length - 1 &&
+      index < numberAccessLesson &&
       lessonProgresses?.some(
         (value) =>
           value?.lesson_id?._id == lessons[index]?._id && value?.is_completed
@@ -133,7 +124,7 @@ const LessonDetail = () => {
     ) {
       navigate(`/course/${courseId}/lesson/${lessons[index + 1]?._id}`);
     }
-  }, [courseId, id, lessonProgresses, lessons, navigate]);
+  }, [courseId, id, lessonProgresses, lessons, navigate, numberAccessLesson]);
   const createLessonProgress = async () => {
     if (!loading && !isAdmin && !isInstructor) {
       if (!lessonProgresses?.some((value) => value.lesson_id._id == id)) {
@@ -180,9 +171,9 @@ const LessonDetail = () => {
   return (
     <>
       <Navbar />
-      <div className="flex py-24">
-        <div className="flex flex-col gap-y-2 w-[60%]">
-          <div className="h-[450px] bg-surface-nav py-8 px-10">
+      <div className="flex flex-col gap-y-6 lg:flex-row py-24">
+        <div className="flex flex-col gap-y-2 w-full lg:w-[60%]">
+          <div className="h-[350px] md:h-[450px] bg-surface-nav py-8 px-10">
             <ReactPlayer
               onStart={() => {
                 if (!isAdmin && !isInstructor)
@@ -191,22 +182,18 @@ const LessonDetail = () => {
               onPlay={createLessonProgress}
               onProgress={updateLessonProgress}
               ref={playerRef}
-              width={680}
-              height={400}
               src={lesson?.video_url || null}
               controls={isAdmin || isInstructor}
+              style={{ width: "100%", height: "100%" }}
             />
           </div>
-          <div className="flex gap-x-2 px-10 text-surface-nav">
-            <p className="text-headline-md font-bold">
-              Bài {lesson?.order || ""}
-            </p>
-            <p className="text-headline-md font-bold">
-              {lesson?.lesson_name || ""}
+          <div className="px-6 md:px-10 text-surface-nav text-headline-md font-bold">
+            <p>
+              Bài {lesson?.order || ""}: {lesson?.lesson_name || ""}
             </p>
           </div>
         </div>
-        <div className="flex flex-col w-[40%] gap-y-4 px-8">
+        <div className="flex flex-col w-full lg:w-[40%] gap-y-4 px-8">
           <div className="flex justify-between">
             <p className="text-title-lg text-surface-nav font-medium">
               Nội dung khóa học
@@ -225,6 +212,7 @@ const LessonDetail = () => {
               //Bài học chỉ có thể xem khi là bài học đầu tiên hoặc bài học phía trước đã hoàn thành
               const accessLesson =
                 isAdmin ||
+                isInstructor ||
                 value.order == 1 ||
                 (prevLesson &&
                   lessonProgresses?.some(
@@ -237,11 +225,18 @@ const LessonDetail = () => {
                     if (isCompleted) {
                       toast.success("Bài học này đã hoàn thành!");
                       return;
+                    } else if (
+                      value.order >= numberAccessLesson &&
+                      me?.role_id?.role === "user"
+                    ) {
+                      toast.warning(
+                        "Vui lòng thanh toán đầy đủ để mở khóa toàn bộ bài học!"
+                      );
+                      return;
                     } else if (!accessLesson) {
                       toast.warning("Bạn chưa hoàn thành bài học trước!");
                       return;
-                    }
-                    navigate(`/course/${courseId}/lesson/${value._id}`);
+                    } else navigate(`/course/${courseId}/lesson/${value._id}`);
                   }}
                   key={value._id}
                   className={`flex justify-between ${
@@ -250,24 +245,24 @@ const LessonDetail = () => {
                       : "hover:cursor-not-allowed"
                   }`}
                 >
-                  <div className="flex flex-col">
+                  <div className="flex flex-col gap-y-1">
                     <p className="text-body-lg text-surface-nav font-medium">
                       {value.lesson_name}
                     </p>
                     <div className="flex gap-x-1 items-center">
                       <IoPlayCircleOutline className="text-title-lg text-brand-blue" />
                       <p className="text-body-lg text-nav-muted">
-                        {secondToTime(value.duration)}
+                        {format.formatSecondToTime({ second: value.duration })}
                       </p>
                     </div>
                   </div>
                   {isCompleted ? (
-                    <FaCheck className="text-green-500 text-title-lg" />
+                    <FaCheck className="text-green-500 text-title-lg shrink-0" />
                   ) : accessLesson ? (
-                    <IoPlayCircleOutline className="text-title-lg text-brand-blue" />
+                    <IoPlayCircleOutline className="text-title-lg text-brand-blue shrink-0" />
                   ) : (
                     <IoIosLock
-                      className={`text-title-lg ${
+                      className={`text-title-lg shrink-0 ${
                         value.order <= numberAccessLesson
                           ? "text-brand-blue"
                           : "text-surface-nav"

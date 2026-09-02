@@ -1,6 +1,7 @@
 import axios from "axios";
+export const api = "https://lms-server-2xk1.onrender.com";
 export const axiosClient = axios.create({
-  baseURL: "https://lms-server-2xk1.onrender.com",
+  baseURL: api,
   headers: {
     "Content-Type": "application/json",
   },

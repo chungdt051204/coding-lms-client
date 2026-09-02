@@ -1,11 +1,18 @@
 import { useSearchParams } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa6";
-import { FaArrowRight } from "react-icons/fa6";
 
 const PaginationButton = ({ totalPages }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const pages = Array.from({ length: totalPages });
-  const currentPage = searchParams.get("page") || 1;
+  // Tính toán dải 3 nút trang xoay quanh trang hiện tại
+  const getVisiblePages = () => {
+    if (totalPages <= 3) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    if (currentPage === 1) return [1, 2, 3];
+    if (currentPage >= totalPages)
+      return [totalPages - 2, totalPages - 1, totalPages];
+    return [currentPage - 1, currentPage, currentPage + 1];
+  };
+  const currentPage = Number(searchParams.get("page")) || 1;
   const handleSetParams = ({ page }) => {
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
@@ -18,14 +25,12 @@ const PaginationButton = ({ totalPages }) => {
     <>
       <div className="flex justify-between">
         <button
-          disabled={currentPage == 1}
+          disabled={currentPage <= 1}
           onClick={() => {
-            if (currentPage > 1) {
-              handleSetParams({ page: Number(currentPage - 1) });
-            }
+            handleSetParams({ page: currentPage - 1 });
           }}
           className={`flex gap-x-2 items-center px-4 py-1 border border-gray-200 rounded-[8px] text-title-sm font-medium ${
-            currentPage == 1
+            currentPage <= 1
               ? "text-nav-muted hover:cursor-not-allowed"
               : "text-surface-nav transition-transform duration-300 hover:cursor-pointer hover:bg-surface-bg"
           }`}
@@ -33,27 +38,26 @@ const PaginationButton = ({ totalPages }) => {
           Trang trước
         </button>
         <div className="flex gap-x-2">
-          {pages?.map((_, i) => {
+          {getVisiblePages()?.map((value, i) => {
             return (
               <button
-                onClick={() => handleSetParams({ page: i + 1 })}
+                onClick={() => handleSetParams({ page: value })}
                 key={i}
                 className={`px-4 py-2 rounded-[8px] text-title-sm font-medium transition-transform duration-300 hover:cursor-pointer ${
-                  currentPage == i + 1
+                  currentPage == value
                     ? "bg-brand-blue text-surface-white"
                     : "bg-surface-bg hover:bg-gray-200"
                 }`}
               >
-                {i + 1}
+                {value}
               </button>
             );
           })}
         </div>
         <button
-          disabled={currentPage == totalPages}
+          disabled={currentPage >= totalPages}
           onClick={() => {
-            if (currentPage < totalPages)
-              handleSetParams({ page: Number(currentPage + 1) });
+            handleSetParams({ page: currentPage + 1 });
           }}
           className={`flex gap-x-2 items-center px-4 py-1 rounded-[8px] text-title-sm text-surface-white font-medium ${
             currentPage == totalPages

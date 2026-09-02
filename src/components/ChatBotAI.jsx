@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { aiService } from "../services/aiService";
-import chatbotAI from "../assets/ChatBotAI.png";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
-import loadingIcon from "../assets/three-dots.gif";
 import { FiSend } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import { format } from "../../helper/format";
@@ -14,6 +12,9 @@ import typing from "../assets/typing.gif";
 import thinking from "../assets/thinking.gif";
 import answering from "../assets/answering.gif";
 import done from "../assets/done.gif";
+import loadingIcon from "../assets/three-dots.gif";
+import chatbotAI from "../assets/ChatBotAI.png";
+
 const gifs = [idle, typing, thinking, answering, done];
 const ChatBotAI = () => {
   const navigate = useNavigate();

@@ -3,8 +3,9 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { userService } from "../../services/userService";
 import { format } from "../../../helper/format";
-import { Progress } from "antd";
 import { socket } from "../../../socket";
+import { toast } from "react-toastify";
+import { Progress } from "antd";
 import { MdOutlineEmail } from "react-icons/md";
 import { FiPhone } from "react-icons/fi";
 import { FiCalendar } from "react-icons/fi";
@@ -13,7 +14,6 @@ import { IoBookOutline } from "react-icons/io5";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { FiTarget } from "react-icons/fi";
 import { VscError } from "react-icons/vsc";
-import { toast } from "react-toastify";
 import PaginationButton from "../../components/PaginationButton";
 
 const StudentDetail = () => {
@@ -68,7 +68,7 @@ const StudentDetail = () => {
   };
   return (
     <>
-      <div className="py-8 w-[95%]">
+      <div className="w-[100%] px-6 md:px-8 py-8">
         <div className="flex gap-x-3 items-center text-title-sm text-nav-muted transition-transform duration-300 hover:text-surface-nav hover:cursor-pointer">
           <FaArrowLeft onClick={() => navigate(-1)} />
           <p className="font-medium">Quay lại danh sách</p>
@@ -80,7 +80,7 @@ const StudentDetail = () => {
             src={studentInfo?.item?.avatar || null}
             alt=""
           />
-          <div className="flex flex-col gap-y-1 ms-[120px]">
+          <div className="flex flex-col gap-y-2 ms-[120px]">
             <p className="text-headline-md text-surface-nav font-bold">
               {studentInfo?.item?.full_name || ""}
             </p>
@@ -88,7 +88,7 @@ const StudentDetail = () => {
               {studentInfo?.item?.email || ""}
             </p>
           </div>
-          <div className="flex gap-x-10">
+          <div className="flex flex-wrap gap-y-2 justify-between md:flex-row">
             <div className="flex gap-x-1 items-center text-title-sm text-nav-muted">
               <MdOutlineEmail />
               <p>{studentInfo?.item?.email || ""}</p>
@@ -107,7 +107,7 @@ const StudentDetail = () => {
             </div>
           </div>
           <hr className="text-surface-bg" />
-          <div className="flex justify-between px-10">
+          <div className="flex flex-wrap justify-between gap-y-2 md:flex-row md:px-10">
             <div className="flex flex-col gap-y-1">
               <p className="text-center text-headline-md text-surface-nav font-bold">
                 {studentInfo?.totalEnrollments?.length}
@@ -148,13 +148,13 @@ const StudentDetail = () => {
                 className="flex flex-col gap-y-4 p-5 shadow-sm rounded-[16px]"
                 key={value?.item?._id}
               >
-                <div className="flex gap-x-6">
+                <div className="flex flex-col gap-y-4 md:flex-row md:gap-x-6">
                   <img
-                    className="w-[300px] h-[180px] object-cover rounded-[8px]"
+                    className="w-full md:w-[300px] h-[180px] object-cover rounded-[8px]"
                     src={value?.item?.course_id?.thumbnail_url}
                     alt=""
                   />
-                  <div className="flex flex-col gap-y-1 w-full">
+                  <div className="flex flex-col gap-y-2 w-full">
                     <p className="text-headline-sm text-surface-nav font-medium">
                       {value?.item?.course_id?.course_name}
                     </p>

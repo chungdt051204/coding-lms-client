@@ -16,16 +16,13 @@ ChartJS.register({
   Tooltip,
   Legend,
 });
-const BarChart = ({ text, labels, label1, data1 }) => {
+
+const BarChart = ({ labels, label1, data1 }) => {
   const options = {
     responsive: true,
     plugins: {
       legend: {
         position: "top",
-      },
-      title: {
-        display: true,
-        text: text,
       },
     },
   };

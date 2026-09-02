@@ -1,4 +1,5 @@
+import { api } from "./src/services/axiosClient";
 import { io } from "socket.io-client";
-export const socket = io("https://lms-server-2xk1.onrender.com", {
+export const socket = io(api, {
   withCredentials: true,
 });

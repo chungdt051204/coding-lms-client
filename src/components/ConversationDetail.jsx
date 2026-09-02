@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { messageService } from "../services/messageService";
+import { socket } from "../../socket";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { FiExternalLink } from "react-icons/fi";
 import { FiSend } from "react-icons/fi";
 import { FaArrowLeft } from "react-icons/fa";
-import { messageService } from "../services/messageService";
-import { socket } from "../../socket";
-import { useNavigate } from "react-router-dom";
+
 const ConversationDetail = ({
   setRefresh,
   setConversation,
