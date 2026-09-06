@@ -217,7 +217,7 @@ const Cart = () => {
                         />
                       </div>
                       <div className="flex flex-col gap-y-1 text-body-lg text-surface-nav font-medium">
-                        <p className="text-headline-md text-brand-blue">
+                        <p className="text-headline-md text-brand-blue wrap-break-word">
                           {value?.course_id?.course_name}
                         </p>
                         <div className="flex flex-col md:flex-row md:gap-x-8 text-body-lg">
@@ -342,7 +342,7 @@ const Cart = () => {
               <FiUser className="text-title-lg text-nav-muted" />
               <div className="flex flex-col text-title-sm">
                 <p className="text-nav-muted">Họ tên</p>
-                <p className="text-surface-nav font-medium">
+                <p className="text-surface-nav font-medium wrap-break-word">
                   {me?.full_name || ""}
                 </p>
               </div>
@@ -351,7 +351,7 @@ const Cart = () => {
               <MdOutlineEmail className="text-title-lg text-nav-muted" />
               <div className="flex flex-col text-title-sm">
                 <p className="text-nav-muted">Email</p>
-                <p className="text-surface-nav font-medium">
+                <p className="text-surface-nav font-medium wrap-break-word">
                   {me?.email || ""}
                 </p>
               </div>
@@ -375,7 +375,7 @@ const Cart = () => {
                         className="w-[80px] h-[60px] object-contain"
                       />
                       <div className="flex flex-col">
-                        <p className="text-title-sm text-surface-nav font-medium">
+                        <p className="text-title-sm text-surface-nav font-medium wrap-break-word">
                           {value?.course_id?.course_name}
                         </p>
                         <p className="text-body-lg text-nav-muted">

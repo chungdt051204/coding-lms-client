@@ -173,7 +173,7 @@ const LessonDetail = () => {
       <Navbar />
       <div className="flex flex-col gap-y-6 lg:flex-row py-24">
         <div className="flex flex-col gap-y-2 w-full lg:w-[60%]">
-          <div className="h-[350px] md:h-[450px] bg-surface-nav py-8 px-10">
+          <div className="h-[350px] md:h-[450px] bg-surface-nav py-8 px:0 md:px-10">
             <ReactPlayer
               onStart={() => {
                 if (!isAdmin && !isInstructor)
@@ -184,7 +184,10 @@ const LessonDetail = () => {
               ref={playerRef}
               src={lesson?.video_url || null}
               controls={isAdmin || isInstructor}
-              style={{ width: "100%", height: "100%" }}
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
             />
           </div>
           <div className="px-6 md:px-10 text-surface-nav text-headline-md font-bold">
@@ -202,7 +205,7 @@ const LessonDetail = () => {
               {lessons.length} bài học
             </p>
           </div>
-          <ul className="p-4 border border-gray-300 rounded-[16px]">
+          <ul className="flex flex-col gap-y-2 md:gap-y-1 p-4 border border-gray-300 rounded-[16px]">
             {lessons?.map((value, index) => {
               const currentProgress = lessonProgresses?.find(
                 (item) => item.lesson_id?._id == value._id
@@ -245,30 +248,36 @@ const LessonDetail = () => {
                       : "hover:cursor-not-allowed"
                   }`}
                 >
-                  <div className="flex flex-col gap-y-1">
-                    <p className="text-body-lg text-surface-nav font-medium">
-                      {value.lesson_name}
-                    </p>
-                    <div className="flex gap-x-1 items-center">
-                      <IoPlayCircleOutline className="text-title-lg text-brand-blue" />
-                      <p className="text-body-lg text-nav-muted">
-                        {format.formatSecondToTime({ second: value.duration })}
+                  <div className="flex flex-col gap-y-2 w-full md:flex-row md:justify-between md:items-center">
+                    <div className="flex justify-between md:flex-col md:gap-y-1">
+                      <p className="text-body-lg text-surface-nav font-medium">
+                        {value.lesson_name}
                       </p>
+                      <div className="flex gap-x-1 items-center">
+                        <IoPlayCircleOutline className="text-title-lg text-brand-blue" />
+                        <p className="text-body-lg text-nav-muted">
+                          {format.formatSecondToTime({
+                            second: value.duration,
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      {isCompleted ? (
+                        <FaCheck className="text-green-500 text-title-lg shrink-0" />
+                      ) : accessLesson ? (
+                        <IoPlayCircleOutline className="text-title-lg text-brand-blue shrink-0" />
+                      ) : (
+                        <IoIosLock
+                          className={`text-title-lg shrink-0 ${
+                            value.order <= numberAccessLesson
+                              ? "text-brand-blue"
+                              : "text-surface-nav"
+                          } `}
+                        />
+                      )}
                     </div>
                   </div>
-                  {isCompleted ? (
-                    <FaCheck className="text-green-500 text-title-lg shrink-0" />
-                  ) : accessLesson ? (
-                    <IoPlayCircleOutline className="text-title-lg text-brand-blue shrink-0" />
-                  ) : (
-                    <IoIosLock
-                      className={`text-title-lg shrink-0 ${
-                        value.order <= numberAccessLesson
-                          ? "text-brand-blue"
-                          : "text-surface-nav"
-                      } `}
-                    />
-                  )}
                 </li>
               );
             })}

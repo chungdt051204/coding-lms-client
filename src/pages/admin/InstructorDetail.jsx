@@ -163,10 +163,10 @@ const InstructorDetail = () => {
                 className="w-[180px] h-[180px] rounded-[1000px] object-cover mx-auto"
                 src={instructorInfo.avatar}
               />
-              <p className="text-title-lg text-surface-nav font-medium">
+              <p className="text-title-lg text-surface-nav font-medium wrap-break-word">
                 {instructorInfo.fullName}
               </p>
-              <p className="text-title-sm text-nav-muted">
+              <p className="text-title-sm text-nav-muted wrap-break-word">
                 {instructorInfo.email}
               </p>
             </div>
@@ -244,7 +244,7 @@ const InstructorDetail = () => {
                   Họ và tên
                 </label>
                 <input
-                  className="px-2 py-1 border border-gray-300 rounded-[8px]"
+                  className="px-2 py-1 border border-gray-300 rounded-[8px] truncate"
                   type="text"
                   value={instructorInfo.fullName}
                   disabled
@@ -258,7 +258,7 @@ const InstructorDetail = () => {
                   Email
                 </label>
                 <input
-                  className="px-2 py-1 border border-gray-300 rounded-[8px]"
+                  className="px-2 py-1 border border-gray-300 rounded-[8px] truncate"
                   type="text"
                   value={instructorInfo.email}
                   disabled
@@ -539,7 +539,7 @@ const InstructorDetail = () => {
                                   alt=""
                                 />
                                 <div>
-                                  <p className="text-surface-nav text-title-sm font-medium">
+                                  <p className="text-surface-nav text-title-sm font-medium wrap-break-word">
                                     {value?.item?.course_name}
                                   </p>
                                 </div>
@@ -598,15 +598,15 @@ const InstructorDetail = () => {
                           key={value?.item?._id}
                           className="flex flex-col gap-y-3 p-4 border border-gray-300 rounded-[16px] bg-surface-white shadow-sm"
                         >
-                          <div className="flex justify-between items-start gap-x-3">
+                          <div className="flex flex-col gap-y-2 md:flex-row md:justify-between md:items-start">
                             <div className="flex gap-x-3 items-center min-w-0">
                               <img
                                 src={value?.item?.image_url}
                                 className="w-[80px] h-[80px] rounded-[8px] object-contain shrink-0"
                                 alt=""
                               />
-                              <div className="min-w-0">
-                                <p className="text-surface-nav text-title-lg font-medium break-words">
+                              <div>
+                                <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                   {value?.item?.course_name}
                                 </p>
                                 <p className="text-nav-muted text-body-lg">
@@ -614,9 +614,8 @@ const InstructorDetail = () => {
                                 </p>
                               </div>
                             </div>
-
                             <span
-                              className={`text-body-lg font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
+                              className={`text-center text-body-lg font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
                                 value?.item?.status === "draft"
                                   ? "text-surface-nav bg-gray-200"
                                   : value?.item?.status === "pending"
@@ -629,7 +628,7 @@ const InstructorDetail = () => {
                               {value?.item?.status}
                             </span>
                           </div>
-                          <div className="flex justify-between px-4 pt-3 border-t border-gray-100 rounded-[12px]">
+                          <div className="flex flex-wrap justify-between gap-x-2 gap-y-1 md:flex-row md:justify-between px-4 pt-3 border-t border-gray-100 rounded-[12px]">
                             <div className="flex flex-col">
                               <span className="text-caption text-nav-muted">
                                 Học viên

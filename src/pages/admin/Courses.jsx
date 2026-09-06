@@ -166,7 +166,9 @@ const AdminCourses = () => {
         </div>
         <div className="flex flex-col gap-y-6">
           {isLoading ? (
-            <p>Đang tải dữ liệu...</p>
+            <p className="text-title-lg text-surface-nav text-center mt-2">
+              Đang tải dữ liệu...
+            </p>
           ) : courses?.arrayCourse?.length == 0 ? (
             <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
               <LuInbox className="text-display-md text-gray-300" />
@@ -202,7 +204,7 @@ const AdminCourses = () => {
                                 alt=""
                               />
                               <div>
-                                <p className="text-surface-nav text-title-lg font-medium">
+                                <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                   {value?.course.course_name}
                                 </p>
                                 <p className="text-nav-muted text-body-lg">
@@ -210,7 +212,7 @@ const AdminCourses = () => {
                                 </p>
                               </div>
                             </td>
-                            <td className="w-[20%] text-title-sm text-surface-nav font-medium">
+                            <td className="w-[20%] text-title-sm text-surface-nav font-medium wrap-break-word">
                               {value?.course.user_id.full_name}
                             </td>
                             <td className="flex gap-x-1 items-center w-[15%] text-title-sm text-surface-nav">
@@ -301,7 +303,7 @@ const AdminCourses = () => {
                         key={value?.course._id}
                         className="flex flex-col gap-y-3 p-4 border border-surface-bg rounded-[16px] bg-surface-white shadow-sm"
                       >
-                        <div className="flex justify-between items-start gap-x-3">
+                        <div className="flex flex-col gap-y-2 md:flex-row md:items-start md:justify-between">
                           <div className="flex gap-x-3 items-center">
                             <img
                               src={value?.course.image_url}
@@ -309,7 +311,7 @@ const AdminCourses = () => {
                               alt=""
                             />
                             <div>
-                              <p className="text-surface-nav text-title-lg font-medium">
+                              <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                 {value?.course.course_name}
                               </p>
                               <p className="text-nav-muted text-body-lg">
@@ -317,9 +319,8 @@ const AdminCourses = () => {
                               </p>
                             </div>
                           </div>
-
                           <span
-                            className={`text-body-md font-medium rounded-[8px] px-2 py-1 shrink-0 ${
+                            className={`text-center text-body-sm font-medium rounded-[8px] px-2 py-1 shrink-0 ${
                               value?.course.status === "pending"
                                 ? "text-yellow-700 bg-yellow-100"
                                 : value?.course.status === "approved"
@@ -330,10 +331,10 @@ const AdminCourses = () => {
                             {value?.course.status}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center text-title-sm text-surface-nav pt-2 border-t border-surface-bg">
+                        <div className="flex flex-col gap-y-1 md:flex-row md:justify-between text-title-sm text-surface-nav pt-2 border-t border-surface-bg">
                           <p className="font-medium">
                             Giang viên:{" "}
-                            <span className="text-nav-muted">
+                            <span className="text-nav-muted wrap-break-word">
                               {value?.course.user_id.full_name}
                             </span>
                           </p>
@@ -342,7 +343,7 @@ const AdminCourses = () => {
                             <p>{value.numberEnrollment} học viên</p>
                           </div>
                         </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-surface-bg">
+                        <div className="flex flex-col gap-y-2 md:flex-row md:justify-between pt-2 border-t border-surface-bg">
                           <div
                             onClick={() =>
                               navigate(`/course/${value?.course._id}`)

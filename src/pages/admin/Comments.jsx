@@ -76,7 +76,7 @@ const Comments = () => {
   return (
     <>
       <div className="w-[100%] px-6 md:px-8 py-8">
-        <div className="h-[70px] flex flex-col justify-between">
+        <div className="flex flex-col gap-y-1">
           <p className="text-display-sm text-surface-nav font-bold">
             Quản lý bình luận
           </p>
@@ -121,7 +121,9 @@ const Comments = () => {
         </div>
         <div className="flex flex-col gap-y-6">
           {isLoading ? (
-            <p>Đang tải dữ liệu...</p>
+            <p className="text-title-lg text-surface-nav text-center mt-2">
+              Đang tải dữ liệu...
+            </p>
           ) : comments?.items?.length == 0 ? (
             <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
               <LuInbox className="text-display-md text-gray-300" />
@@ -155,14 +157,14 @@ const Comments = () => {
                                 referrerPolicy="no-referrer"
                                 alt=""
                               />
-                              <p className="text-surface-nav text-title-lg font-medium">
+                              <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                 {value?.user_id?.full_name}
                               </p>
                             </td>
-                            <td className="w-[15%] text-title-sm text-surface-nav">
+                            <td className="w-[15%] text-title-sm text-surface-nav wrap-break-word">
                               <p>{value?.course_id?.course_name}</p>
                             </td>
-                            <td className="w-[25%] text-title-sm text-surface-nav">
+                            <td className="w-[25%] text-title-sm text-surface-nav wrap-break-word">
                               <p>{value?.comment}</p>
                             </td>
                             <td className="w-[15%] px-2">
@@ -224,7 +226,7 @@ const Comments = () => {
                         key={value?._id}
                         className="flex flex-col gap-y-3 p-4 border border-surface-bg rounded-[16px] bg-surface-white shadow-sm"
                       >
-                        <div className="flex justify-between items-start gap-x-3">
+                        <div className="flex flex-col gap-y-2 md:justify-between md:items-start md:gap-x-3">
                           <div className="flex gap-x-3 items-center min-w-0">
                             <img
                               src={value?.user_id?.avatar}
@@ -232,17 +234,17 @@ const Comments = () => {
                               className="w-[60px] h-[60px] rounded-full object-cover shrink-0"
                               alt=""
                             />
-                            <div className="min-w-0">
-                              <p className="text-surface-nav text-title-lg font-medium break-words">
+                            <div>
+                              <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                 {value?.user_id?.full_name}
                               </p>
-                              <p className="text-nav-muted text-body-lg">
+                              <p className="text-nav-muted text-body-lg wrap-break-word">
                                 {value?.course_id?.course_name}
                               </p>
                             </div>
                           </div>
                           <span
-                            className={`text-body-md font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
+                            className={`text-center text-body-md font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
                               value?.status
                                 ? "text-green-700 bg-green-100"
                                 : "text-red-700 bg-red-100"
@@ -255,7 +257,7 @@ const Comments = () => {
                           <p className="text-caption text-nav-muted mb-1 font-medium">
                             Nội dung bình luận:
                           </p>
-                          <p className="text-surface-nav text-body-lg break-words">
+                          <p className="text-surface-nav text-body-lg wrap-break-word">
                             {value?.comment}
                           </p>
                         </div>

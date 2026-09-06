@@ -293,7 +293,7 @@ const CourseDetail = () => {
                   {course?.item?.level || ""}
                 </div>
               </div>
-              <p className="text-headline-lg sm:text-display-md xl:text-display-lg text-surface-white font-medium">
+              <p className="text-headline-lg sm:text-display-md xl:text-display-lg text-surface-white font-medium wrap-break-word">
                 {course?.item?.course_name || ""}
               </p>
               <p className="text-body-md sm:text-title-lg xl:text-headline-sm text-surface-bg">
@@ -324,7 +324,7 @@ const CourseDetail = () => {
                   <p className="text-caption sm:text-body-md xl:text-title-lg text-surface-bg">
                     Giảng viên
                   </p>
-                  <p className="text-title-md sm:text-headline-sm text-surface-white font-medium">
+                  <p className="text-title-md sm:text-headline-sm text-surface-white font-medium wrap-break-word">
                     {course?.item?.user_id?.full_name || ""}
                   </p>
                 </div>
@@ -569,7 +569,7 @@ const CourseDetail = () => {
               {course?.item?.requirements?.map((value, index) => {
                 return (
                   <li key={index} className="flex gap-x-2 items-center">
-                    <p className="text-brand-blue">✓</p>
+                    <p className="text-brand-blue shrink-0">✓</p>
                     {value}
                   </li>
                 );
@@ -584,7 +584,7 @@ const CourseDetail = () => {
               {course?.item?.objectives?.map((value, index) => {
                 return (
                   <li key={index} className="flex gap-x-2 items-center">
-                    <FaCheck className="text-green-500" />
+                    <FaCheck className="text-green-500 shrink-0" />
                     {value}
                   </li>
                 );
@@ -592,11 +592,11 @@ const CourseDetail = () => {
             </ul>
           </div>
           <div className="flex flex-col gap-y-4 px-8 py-4 mt-8 bg-surface-white border border-gray-300 rounded-[16px]">
-            <div className="flex justify-between">
+            <div className="flex flex-col gap-y-1 md:flex-row md:justify-between">
               <p className="text-headline-sm md:text-headline-md text-surface-nav font-medium">
                 Nội dung khóa học
               </p>
-              <p className="text-title-sm text-surface-nav font-medium">
+              <p className="text-title-lg text-surface-nav font-medium">
                 {course?.lessons?.length + " " + "bài học"}
               </p>
             </div>
@@ -645,34 +645,38 @@ const CourseDetail = () => {
                         : "hover:cursor-not-allowed"
                     } hover:bg-surface-bg`}
                   >
-                    <div className="flex items-center gap-x-3 text-title-sm md:text-title-lg">
-                      <div className="px-4 py-2 text-brand-blue font-medium bg-blue-200 rounded-[8px]">
-                        {index + 1}
-                      </div>
-                      <p className="text-surface-nav font-medium w-[80%] md:w-full">
-                        {value.lesson_name}
-                      </p>
-                    </div>
-                    {isCompleted ? (
-                      <FaCheck className="text-green-500 shrink-0 " />
-                    ) : accessLesson ? (
-                      <div className="flex gap-x-2 items-center shrink-0 ">
-                        <p>
-                          {format.formatSecondToTime({
-                            second: value.duration,
-                          })}
+                    <div className="flex flex-col gap-y-2 md:flex-row md:justify-between md:items-center w-full">
+                      <div className="flex items-center gap-x-4 text-title-sm md:text-title-lg">
+                        <div className="px-4 py-2 text-brand-blue font-medium bg-blue-200 rounded-[8px]">
+                          {index + 1}
+                        </div>
+                        <p className="text-surface-nav font-medium w-full">
+                          {value.lesson_name}
                         </p>
-                        <IoPlayCircleOutline className="text-headline-md text-brand-blue" />
                       </div>
-                    ) : (
-                      <IoIosLock
-                        className={`shrink-0 ${
-                          value.order <= numberAccessLesson
-                            ? "text-brand-blue"
-                            : "text-surface-nav"
-                        } `}
-                      />
-                    )}
+                      <div className="flex justify-end">
+                        {isCompleted ? (
+                          <FaCheck className="text-green-500 shrink-0 " />
+                        ) : accessLesson ? (
+                          <div className="flex gap-x-2 items-center shrink-0 ">
+                            <p>
+                              {format.formatSecondToTime({
+                                second: value.duration,
+                              })}
+                            </p>
+                            <IoPlayCircleOutline className="text-headline-md text-brand-blue" />
+                          </div>
+                        ) : (
+                          <IoIosLock
+                            className={`shrink-0 ${
+                              value.order <= numberAccessLesson
+                                ? "text-brand-blue"
+                                : "text-surface-nav"
+                            } `}
+                          />
+                        )}
+                      </div>
+                    </div>
                   </li>
                 );
               })}

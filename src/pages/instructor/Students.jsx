@@ -43,7 +43,9 @@ const Students = () => {
         </div>
         <div className="flex flex-col gap-y-6">
           {isLoading ? (
-            <p>Đang tải dữ liệu...</p>
+            <p className="text-title-lg text-surface-nav text-center mt-2">
+              Đang tải dữ liệu...
+            </p>
           ) : students?.items?.length == 0 ? (
             <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
               <LuInbox className="text-display-md text-gray-300" />
@@ -53,8 +55,8 @@ const Students = () => {
             <table className="border-separate border-spacing-0 overflow-hidden border-1 border-surface-bg rounded-[16px] mt-6">
               <thead>
                 <tr className="flex items-center justify-between text-surface-nav font-medium">
-                  <td className="w-[60%] p-2">Học viên</td>
-                  <td className="w-[25%] p-2 text-right">Thao tác</td>
+                  <td className="w-[50%] p-2">Học viên</td>
+                  <td className="w-[30%] p-2 text-right">Thao tác</td>
                 </tr>
               </thead>
               <tbody>
@@ -66,15 +68,15 @@ const Students = () => {
                     >
                       <td className="flex items-center gap-x-2 w-[60%] p-2">
                         <img
-                          className="w-[44px] h-[44px] rounded-[1000px] object-cover"
+                          className="w-[50px] h-[50px] rounded-[1000px] object-contain shrink-0"
                           src={value.avatar}
                           referrerPolicy="no-referrer"
                         />
                         <div>
-                          <p className="text-surface-nav text-title-lg font-medium">
+                          <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                             {value.full_name}
                           </p>
-                          <p className="text-nav-muted text-body-lg">
+                          <p className="text-nav-muted text-body-lg wrap-break-word">
                             {value.email}
                           </p>
                         </div>

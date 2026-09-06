@@ -830,10 +830,12 @@ const CourseEditor = () => {
                       <span className="text-body-md text-red-500">
                         {errorLessons[index]?.errorVideoUrl}
                       </span>
-                      {value.videoUrl &&
-                        value.videoUrl.includes("https://www.youtube.com/") && (
-                          <ReactPlayer src={value.videoUrl} />
-                        )}
+                      <div>
+                        {value.videoUrl &&
+                          value.videoUrl.includes(
+                            "https://www.youtube.com/"
+                          ) && <ReactPlayer src={value.videoUrl} />}
+                      </div>
                       <label
                         className="text-surface-nav text-body-lg font-medium"
                         htmlFor="duration"

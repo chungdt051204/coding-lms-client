@@ -253,7 +253,7 @@ const TestEditor = () => {
                 Tên bài kiểm tra
               </label>
               <input
-                className="p-2 bg-surface-bg rounded-[8px]"
+                className="p-2 bg-surface-bg rounded-[8px] truncate"
                 value={testInfo.testName}
                 onChange={(e) => {
                   setTestInfo((prev) => ({

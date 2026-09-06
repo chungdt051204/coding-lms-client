@@ -92,7 +92,7 @@ const MyCourses = () => {
                       alt=""
                     />
                     <div className="flex flex-col gap-y-2 sm:gap-y-1 w-full justify-between">
-                      <p className="text-title-lg sm:text-headline-sm text-surface-nav font-medium line-clamp-2">
+                      <p className="text-title-lg sm:text-headline-sm text-surface-nav font-medium wrap-break-word">
                         {value?.item?.course_id?.course_name}
                       </p>
 

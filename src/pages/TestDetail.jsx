@@ -159,7 +159,7 @@ const TestDetail = () => {
             <p className="text-headline-md text-surface-nav font-bold">
               {test?.test_name || ""}
             </p>
-            <div className="flex gap-x-6">
+            <div className="flex gap-x-4">
               <div className="flex gap-x-2 items-center py-2 px-4 rounded-[8px] bg-blue-100 text-headline-sm text-blue-700 font-bold">
                 <GoClock />
                 <p>
@@ -245,7 +245,7 @@ const TestDetail = () => {
                 })}
               </div>
             </div>
-            <div className="flex justify-between mt-6">
+            <div className="flex flex-col gap-y-2 md:flex-row md:justify-between mt-6">
               <button
                 onClick={() => {
                   if (!clicked) {
@@ -255,7 +255,7 @@ const TestDetail = () => {
                   setCurrentIndex(currentIndex - 1);
                 }}
                 disabled={currentIndex == 0}
-                className={`flex gap-x-2 items-center px-4 py-1 border border-gray-200 rounded-[8px] text-title-sm font-medium ${
+                className={`flex justify-center gap-x-2 items-center px-4 py-2 md:py-1 border border-gray-200 rounded-[8px] text-title-sm font-medium ${
                   currentIndex == 0
                     ? "text-nav-muted hover:cursor-not-allowed"
                     : "text-surface-nav transition-transform duration-300 hover:cursor-pointer hover:bg-surface-bg"
@@ -273,7 +273,7 @@ const TestDetail = () => {
                   setCurrentIndex(currentIndex + 1);
                 }}
                 disabled={currentIndex == questions?.length - 1}
-                className={`flex gap-x-2 items-center px-4 py-1 rounded-[8px] text-title-sm text-surface-white font-medium ${
+                className={`flex justify-center gap-x-2 items-center px-4 py-2 md:py-1 rounded-[8px] text-title-sm text-surface-white font-medium ${
                   currentIndex == questions?.length - 1
                     ? "bg-gray-400 hover:cursor-not-allowed"
                     : "bg-surface-nav transition-transform duration-300 hover:cursor-pointer hover:text-surface-bg"

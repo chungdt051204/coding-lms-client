@@ -80,11 +80,11 @@ const StudentDetail = () => {
             src={studentInfo?.item?.avatar || null}
             alt=""
           />
-          <div className="flex flex-col gap-y-2 ms-[120px]">
-            <p className="text-headline-md text-surface-nav font-bold">
+          <div className="flex flex-col gap-y-2 ms-[120px] w-[50%]">
+            <p className="text-headline-md text-surface-nav font-bold wrap-break-word">
               {studentInfo?.item?.full_name || ""}
             </p>
-            <p className="text-title-sm text-nav-muted">
+            <p className="text-title-sm text-nav-muted hidden md:block">
               {studentInfo?.item?.email || ""}
             </p>
           </div>
@@ -107,14 +107,14 @@ const StudentDetail = () => {
             </div>
           </div>
           <hr className="text-surface-bg" />
-          <div className="flex flex-wrap justify-between gap-y-2 md:flex-row md:px-10">
-            <div className="flex flex-col gap-y-1">
-              <p className="text-center text-headline-md text-surface-nav font-bold">
+          <div className="flex flex-col gap-y-2 md:flex-row md:justify-between md:px-10">
+            <div className="flex flex-col gap-y-1 text-center">
+              <p className="text-headline-md text-surface-nav font-bold">
                 {studentInfo?.totalEnrollments?.length}
               </p>
               <p className="text-body-md text-nav-muted">Khóa học đã đăng ký</p>
             </div>
-            <div className="flex flex-col gap-y-1">
+            <div className="flex flex-col gap-y-1 text-center">
               <p className="text-center text-headline-md text-green-600 font-bold">
                 {
                   studentInfo?.totalEnrollments?.filter(
@@ -126,7 +126,7 @@ const StudentDetail = () => {
                 Khóa học đã hoàn thành
               </p>
             </div>
-            <div className="flex flex-col gap-y-1">
+            <div className="flex flex-col gap-y-1 text-center">
               <p className="text-center text-headline-md text-blue-500 font-bold">
                 {getAverageProgress()}%
               </p>
@@ -155,7 +155,7 @@ const StudentDetail = () => {
                     alt=""
                   />
                   <div className="flex flex-col gap-y-2 w-full">
-                    <p className="text-headline-sm text-surface-nav font-medium">
+                    <p className="text-headline-sm text-surface-nav font-medium wrap-break-word">
                       {value?.item?.course_id?.course_name}
                     </p>
                     <div className="flex gap-x-1 items-center text-body-lg text-nav-muted">
@@ -206,10 +206,10 @@ const StudentDetail = () => {
                                 {item?.score}
                               </div>
                               <div className="flex flex-col">
-                                <p className="text-title-sm text-surface-nav font-medium">
+                                <p className="text-title-sm text-surface-nav font-medium wrap-break-word">
                                   {item?.test_id?.test_name}
                                 </p>
-                                <div className="flex gap-x-4 text-body-md text-nav-muted">
+                                <div className="flex gap-x-14 md:gap-x-4 text-body-md text-nav-muted">
                                   <p>
                                     {format.formatDate({
                                       date: item?.submitted_at,
@@ -220,17 +220,12 @@ const StudentDetail = () => {
                               </div>
                             </div>
                             <div
-                              className={`flex gap-x-1 items-center px-2 py-1 rounded-[8px] text-body-md font-medium ${
+                              className={`hidden md:block px-2 py-1 rounded-[8px] text-body-md font-medium ${
                                 item?.score >= item?.test_id?.pass_score
                                   ? "bg-green-100 text-green-600 border-green-600"
                                   : "bg-red-100 text-red-600 border-red-600"
                               }`}
                             >
-                              {item?.score >= item?.test_id?.pass_score ? (
-                                <FiTarget />
-                              ) : (
-                                <VscError />
-                              )}
                               {item?.score >= item?.test_id?.pass_score
                                 ? "Đạt"
                                 : "Chưa đạt"}

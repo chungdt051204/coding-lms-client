@@ -175,8 +175,12 @@ const OrderDetail = () => {
                   </thead>
                   <tbody>
                     <tr className="text-title-sm text-surface-nav font-medium">
-                      <td className="py-1">{order?.item?.full_name}</td>
-                      <td className="py-1 break-all">{order?.item?.email}</td>
+                      <td className="py-1 wrap-break-word">
+                        {order?.item?.full_name}
+                      </td>
+                      <td className="py-1 wrap-break-word">
+                        {order?.item?.email}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -184,13 +188,13 @@ const OrderDetail = () => {
               <div className="flex flex-col gap-y-2 sm:hidden text-body-md font-medium">
                 <div className="flex justify-between items-center">
                   <span className="text-nav-muted">Họ tên:</span>
-                  <span className="font-medium text-surface-nav">
+                  <span className="font-medium text-surface-nav wrap-break-word">
                     {order?.item?.full_name}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-nav-muted">Email:</span>
-                  <span className="text-surface-nav break-all">
+                  <span className="text-surface-nav wrap-break-word">
                     {order?.item?.email}
                   </span>
                 </div>
@@ -235,7 +239,7 @@ const OrderDetail = () => {
           <div className="flex flex-col gap-y-3 p-4 sm:p-5 border border-gray-300 rounded-[16px] w-full xl:w-[38%] bg-surface-white">
             <div className="flex gap-x-2 items-center text-title-lg font-medium">
               <IoBookOutline className="text-brand-blue shrink-0" />
-              <p className="text-surface-nav">
+              <p className="text-surface-nav text-title-sm">
                 Các khóa học trong đơn hàng ({order?.orderItems?.length || 0})
               </p>
             </div>
@@ -252,7 +256,7 @@ const OrderDetail = () => {
                     className="w-[80px] h-[60px] sm:w-[100px] sm:h-[80px] object-cover rounded-[8px] shrink-0"
                   />
                   <div className="flex flex-col gap-y-1 min-w-0">
-                    <p className="text-body-lg sm:text-headline-sm text-surface-nav font-medium line-clamp-2">
+                    <p className="text-body-lg sm:text-headline-sm text-surface-nav font-medium wrap-break-word">
                       {value.course_name}
                     </p>
                     <div className="flex items-center gap-x-2">

@@ -204,7 +204,7 @@ const AdminDashboard = () => {
                             alt=""
                           />
                           <div className="flex flex-col gap-y-1">
-                            <p className="text-title-lg text-surface-nav font-medium">
+                            <p className="text-title-lg text-surface-nav font-medium wrap-break-word">
                               {value?.data?.course_name}
                             </p>
                             <div className="flex gap-x-1 items-center text-title-sm">
@@ -263,7 +263,7 @@ const AdminDashboard = () => {
                               />
                             </div>
                             <div className="flex flex-col gap-y-0.5 sm:gap-y-1 min-w-0">
-                              <p className="text-body-md sm:text-title-lg text-surface-nav font-medium">
+                              <p className="text-body-md sm:text-title-lg text-surface-nav font-medium wrap-break-word">
                                 {value?.data?.course_name}
                               </p>
                               <div className="flex gap-x-1 items-center text-caption sm:text-title-sm">
@@ -327,7 +327,7 @@ const AdminDashboard = () => {
                               alt={value.course_name || ""}
                             />
                             <div className="flex flex-col gap-y-0.5 sm:gap-y-1 min-w-0">
-                              <p className="text-body-md sm:text-title-lg text-surface-nav font-medium">
+                              <p className="text-body-md sm:text-title-lg text-surface-nav font-medium wrap-break-word">
                                 {value.course_name}
                               </p>
                               <div className="flex gap-x-1 items-center text-caption sm:text-title-sm">

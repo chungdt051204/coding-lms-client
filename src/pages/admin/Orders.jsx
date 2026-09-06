@@ -69,7 +69,7 @@ const Orders = () => {
   return (
     <>
       <div className="w-[100%] px-6 md:px-8 py-8">
-        <div className="flex flex-col gap-y-2">
+        <div className="flex flex-col gap-y-1">
           <p className="text-display-sm text-surface-nav font-bold">
             Quản lý đơn hàng
           </p>
@@ -118,7 +118,7 @@ const Orders = () => {
         </div>
         <div className="flex flex-col gap-y-6">
           {isLoading ? (
-            <p className="text-title-lg text-surface-nav text-center">
+            <p className="text-title-lg text-surface-nav text-center mt-2">
               Đang tải dữ liệu...
             </p>
           ) : orders?.items?.length == 0 ? (
@@ -155,7 +155,7 @@ const Orders = () => {
                                 referrerPolicy="no-referrer"
                                 alt=""
                               />
-                              <p className="text-surface-nav text-title-lg font-medium">
+                              <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                 {value?.user_id?.full_name}
                               </p>
                             </td>
@@ -226,7 +226,7 @@ const Orders = () => {
                         key={value._id}
                         className="flex flex-col gap-y-3 p-4 border border-gray-300 rounded-[16px] bg-surface-white shadow-sm"
                       >
-                        <div className="flex justify-between items-start gap-x-3">
+                        <div className="flex flex-col gap-y-2 md:flex-row md:justify-between md:items-start md:gap-x-3">
                           <div className="flex gap-x-3 items-center min-w-0">
                             <img
                               src={value?.user_id?.avatar}
@@ -234,8 +234,8 @@ const Orders = () => {
                               className="w-[60px] h-[60px] rounded-full object-cover shrink-0"
                               alt=""
                             />
-                            <div className="min-w-0">
-                              <p className="text-surface-nav text-title-lg font-medium break-words">
+                            <div>
+                              <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                 {value?.user_id?.full_name}
                               </p>
                               <p className="text-nav-muted text-caption sm:text-body-sm">
@@ -246,7 +246,7 @@ const Orders = () => {
                             </div>
                           </div>
                           <span
-                            className={`text-body-md font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
+                            className={`text-center text-body-md font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
                               value.payment_status === "PENDING"
                                 ? "text-yellow-700 bg-yellow-100"
                                 : value.payment_status === "PARTIAL_PAID"

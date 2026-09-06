@@ -85,7 +85,7 @@ const Notifications = () => {
       <Navbar />
       <div className="pt-20 lg:pt-24 pb-12 px-4 sm:px-8 md:px-16 lg:px-40 min-h-screen">
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-y-4">
+        <div className="flex flex-col gap-y-4 lg:flex-row lg:justify-between lg:items-start">
           <div className="flex flex-col gap-y-1 sm:gap-y-2">
             <p className="text-headline-md sm:text-display-xs lg:text-display-sm text-surface-nav font-bold">
               Thông báo
@@ -95,7 +95,7 @@ const Notifications = () => {
             </p>
           </div>
           {notifications?.length > 0 && (
-            <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-x-4">
+            <div className="flex flex-col gap-y-2 md:flex-row md:gap-x-4">
               <button
                 onClick={handleMarkAsAllRead}
                 className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-[8px] bg-surface-white border border-gray-200 text-body-sm sm:text-body-md lg:text-body-lg text-surface-nav font-medium transition-transform duration-300 hover:bg-surface-bg hover:cursor-pointer"

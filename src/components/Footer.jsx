@@ -6,7 +6,7 @@ const Footer = () => {
   const navigate = useNavigate();
   return (
     <>
-      <div className="flex flex-col gap-y-8 p-16 bg-auth">
+      <div className="flex flex-col gap-y-8 py-16 px-8 md:px-16 bg-auth">
         <div className="flex justify-end">
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

@@ -160,7 +160,7 @@ const Tests = () => {
               <p className="text-body-lg text-nav-muted">{`${myTests?.arrayTest?.length} bài kiểm tra`}</p>
             </div>
             {isLoading ? (
-              <p className="text-title-lg text-surface-nav text-center">
+              <p className="text-title-lg text-surface-nav text-center mt-2">
                 Đang tải dữ liệu...
               </p>
             ) : myTests?.arrayTest?.length == 0 ? (
@@ -191,7 +191,7 @@ const Tests = () => {
                             key={value?.test?._id}
                           >
                             <td className="flex flex-col py-2 ps-2">
-                              <p className="text-body-lg text-surface-nav font-medium">
+                              <p className="text-body-lg text-surface-nav font-medium wrap-break-word">
                                 {value?.test?.test_name}
                               </p>
                               <p className="text-nav-muted text-body-md">
@@ -199,7 +199,7 @@ const Tests = () => {
                                 {getDate({ date: value?.test?.createdAt })}
                               </p>
                             </td>
-                            <td className="text-body-lg text-surface-nav">
+                            <td className="text-body-lg text-surface-nav wrap-break-word">
                               {value?.test?.course_id?.course_name}
                             </td>
                             <td>
@@ -304,11 +304,11 @@ const Tests = () => {
                           className="flex flex-col gap-y-3 p-4 border border-gray-300 rounded-[16px] bg-surface-white shadow-sm"
                         >
                           <div className="flex justify-between items-start gap-x-3">
-                            <div className="min-w-0">
-                              <p className="text-body-lg text-surface-nav font-medium break-words">
+                            <div>
+                              <p className="text-body-lg text-surface-nav font-medium wrap-break-word">
                                 {value?.test?.test_name}
                               </p>
-                              <p className="text-nav-muted text-body-md">
+                              <p className="text-nav-muted text-body-md wrap-break-word">
                                 Khóa học: {value?.test?.course_id?.course_name}
                               </p>
                               <p className="text-nav-muted text-body-md">
@@ -419,10 +419,10 @@ const Tests = () => {
                 </div>
               </>
             )}
-            {myTests?.totalPages > 1 && (
-              <PaginationButton totalPages={myTests?.totalPages} />
-            )}
           </div>
+          {myTests?.totalPages > 1 && (
+            <PaginationButton totalPages={myTests?.totalPages} />
+          )}
         </div>
       </div>
       <ConfirmDialog

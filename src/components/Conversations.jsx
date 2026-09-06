@@ -91,7 +91,7 @@ const Conversations = ({ me }) => {
       </div>
       {isClicked && !conversation ? (
         <div
-          className={`w-[350px] border fixed right-5 bg-surface-white z-10 ${
+          className={`w-[300px] md:w-[350px] border fixed right-5 bg-surface-white z-10 ${
             isDropdown ? "top-20" : "bottom-20"
           } border-none shadow-md rounded-[16px]`}
         >
@@ -150,38 +150,40 @@ const Conversations = ({ me }) => {
                               </div>
                             )}
                           </div>
-                          <div className="flex flex-col font-medium">
-                            <p className="text-title-sm text-surface-nav">
+                          <div className="flex flex-col min-w-0 font-medium">
+                            <p className="text-title-sm text-surface-nav wrap-break-word">
                               {value?.item?.user_id?.full_name}
                             </p>
-                            <p
-                              className={`text-body-md ${
-                                !value?.item?.newest_message_id?.is_read &&
-                                getRole({
+                            <div>
+                              <p
+                                className={`truncate max-w-[20ch] text-body-md ${
+                                  !value?.item?.newest_message_id?.is_read &&
+                                  getRole({
+                                    roleId:
+                                      value?.item?.newest_message_id?.sender_id
+                                        ?.role_id,
+                                  }) == "user"
+                                    ? "text-surface-nav"
+                                    : "text-nav-muted"
+                                }`}
+                              >
+                                {getRole({
                                   roleId:
                                     value?.item?.newest_message_id?.sender_id
                                       ?.role_id,
-                                }) == "user"
-                                  ? "text-surface-nav"
-                                  : "text-nav-muted"
-                              }`}
-                            >
-                              {getRole({
-                                roleId:
-                                  value?.item?.newest_message_id?.sender_id
-                                    ?.role_id,
-                              }) == "instructor"
-                                ? "Bạn:" +
-                                  " " +
-                                  value?.item?.newest_message_id?.message
-                                : value?.item?.newest_message_id?.message}
-                            </p>
-                            <p className="text-body-md text-brand-blue">
-                              {value?.item?.course_id?.course_name}
-                            </p>
+                                }) == "instructor"
+                                  ? "Bạn:" +
+                                    " " +
+                                    value?.item?.newest_message_id?.message
+                                  : value?.item?.newest_message_id?.message}
+                              </p>
+                              <p className="text-body-md text-brand-blue wrap-break-word">
+                                {value?.item?.course_id?.course_name}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                        <p className="text-body-md text-nav-muted">
+                        <p className="text-body-md text-nav-muted shrink-0">
                           {getTime({
                             time: value?.item?.newest_message_id?.createdAt,
                           })}

@@ -53,10 +53,10 @@ const UserDetail = () => {
                 src={user?.item?.avatar || null}
                 alt=""
               />
-              <p className="text-title-lg text-surface-nav font-medium">
+              <p className="text-title-lg text-surface-nav font-medium wrap-break-word">
                 {user?.item?.full_name || ""}
               </p>
-              <p className="text-title-sm text-nav-muted">
+              <p className="text-title-sm text-nav-muted wrap-break-word">
                 {user?.item?.email || ""}
               </p>
             </div>
@@ -103,7 +103,7 @@ const UserDetail = () => {
                     Họ và tên
                   </label>
                   <input
-                    className="px-2 py-1 border border-gray-300 rounded-[8px]"
+                    className="px-2 py-1 border border-gray-300 rounded-[8px] truncate"
                     type="text"
                     value={user?.item?.full_name || ""}
                     readOnly
@@ -117,7 +117,7 @@ const UserDetail = () => {
                     Email
                   </label>
                   <input
-                    className="px-2 py-1 border border-gray-300 rounded-[8px]"
+                    className="px-2 py-1 border border-gray-300 rounded-[8px] truncate"
                     type="text"
                     value={user?.item?.email || ""}
                     readOnly
@@ -211,7 +211,7 @@ const UserDetail = () => {
                               alt=""
                             />
                             <div>
-                              <p className="text-surface-nav text-title-sm font-medium">
+                              <p className="text-surface-nav text-title-sm font-medium wrap-break-word">
                                 {value?.course_name}
                               </p>
                             </div>
@@ -219,7 +219,7 @@ const UserDetail = () => {
                           <td className="w-[15%] text-body-md text-nav-muted">
                             {value?.category_id?.category_name}
                           </td>
-                          <td className="text-title-sm text-surface-nav w-[10%]">
+                          <td className="text-title-sm text-surface-nav w-[10%] wrap-break-word">
                             <p>{value?.user_id?.full_name}</p>
                           </td>
                           <td className="w-[10%] text-brand-blue font-bold text-title-sm">
@@ -264,15 +264,15 @@ const UserDetail = () => {
                       key={value?._id}
                       className="flex flex-col gap-y-3 p-4 border border-gray-300 rounded-[16px] bg-surface-white shadow-sm"
                     >
-                      <div className="flex justify-between items-start gap-x-3">
+                      <div className="flex flex-col gap-y-2 md:flex-row md:justify-between md:items-start md:gap-x-3">
                         <div className="flex gap-x-3 items-center min-w-0">
                           <img
                             src={value?.image_url}
                             className="w-[80px] h-[80px] rounded-[8px] object-contain shrink-0"
                             alt=""
                           />
-                          <div className="min-w-0">
-                            <p className="text-surface-nav text-title-lg font-medium break-words">
+                          <div>
+                            <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                               {value?.course_name}
                             </p>
                             <p className="text-nav-muted text-body-lg">
@@ -280,9 +280,8 @@ const UserDetail = () => {
                             </p>
                           </div>
                         </div>
-
                         <span
-                          className={`text-body-lg font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
+                          className={`text-center text-body-lg font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
                             value?.status === "draft"
                               ? "text-surface-nav bg-gray-200"
                               : value?.status === "pending"
@@ -300,7 +299,7 @@ const UserDetail = () => {
                           <span className="text-caption text-nav-muted">
                             Giảng viên
                           </span>
-                          <span className="text-title-sm font-medium text-surface-nav">
+                          <span className="text-title-sm font-medium text-surface-nav wrap-break-word">
                             {value?.user_id?.full_name}
                           </span>
                         </div>

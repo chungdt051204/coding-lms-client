@@ -162,7 +162,7 @@ export const Navbar = () => {
           </div>
           {/* SEARCH BAR */}
           {currentRole === "user" && (
-            <div className="relative w-[43%] lg:w-[32%] md:w-[60%]">
+            <div className="relative w-[30%] lg:w-[32%] md:w-[60%]">
               <div className="flex gap-x-2 items-center py-1.5 sm:py-2 px-3 sm:px-4 bg-surface-bg rounded-[8px]">
                 <IoSearch
                   onClick={() => {
@@ -292,7 +292,7 @@ export const Navbar = () => {
             ))}
           </ul>
           {/* ICONS & ACTIONS */}
-          <div className="flex items-center gap-x-3 lg:gap-x-6 md:gap-x-6">
+          <div className="flex items-center gap-x-2 lg:gap-x-6 md:gap-x-6">
             {isLogin && currentRole === "user" && (
               <div
                 className="relative cursor-pointer"

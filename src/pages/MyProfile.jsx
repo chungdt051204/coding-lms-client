@@ -265,10 +265,12 @@ const MyProfile = () => {
               <span className="text-body-md text-red-500 font-medium">
                 {errorImage.errorAvatar}
               </span>
-              <p className="text-title-lg text-surface-nav font-medium">
+              <p className="text-title-lg text-surface-nav font-medium wrap-break-word">
                 {fullName}
               </p>
-              <p className="text-title-sm text-nav-muted">{me?.email || ""}</p>
+              <p className="text-title-sm text-nav-muted wrap-break-word">
+                {me?.email || ""}
+              </p>
               <button
                 onClick={handleUpdateAvatar}
                 className="flex justify-center px-2 py-1 mt-2 rounded-[8px] bg-surface-nav text-title-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
@@ -338,7 +340,7 @@ const MyProfile = () => {
                     Họ và tên
                   </label>
                   <input
-                    className="px-2 py-1 border border-gray-300 rounded-[8px]"
+                    className="px-2 py-1 border border-gray-300 rounded-[8px] truncate"
                     type="text"
                     onChange={(e) => {
                       setAccountInfo((prev) => ({
@@ -362,7 +364,7 @@ const MyProfile = () => {
                     Email
                   </label>
                   <input
-                    className="px-2 py-1 border border-gray-300 rounded-[8px] hover:cursor-not-allowed"
+                    className="px-2 py-1 border border-gray-300 rounded-[8px] hover:cursor-not-allowed truncate"
                     type="text"
                     value={me?.email || ""}
                     readOnly

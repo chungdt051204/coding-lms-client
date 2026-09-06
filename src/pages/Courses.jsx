@@ -130,7 +130,7 @@ const Courses = () => {
               <input
                 type="text"
                 value={searchValue}
-                className="w-full bg-transparent outline-0 text-body-md sm:text-body-lg text-surface-nav placeholder:text-nav-muted"
+                className="w-full bg-transparent outline-0 text-body-md sm:text-body-lg text-surface-nav placeholder:text-nav-muted truncate"
                 placeholder="Nhập tên khóa học, danh mục, giảng viên"
                 onChange={(e) => {
                   setSearchValue(e.target.value);

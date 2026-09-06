@@ -95,7 +95,7 @@ const MyOrders = () => {
           <p className="text-headline-md sm:text-display-sm text-surface-nav font-bold">
             Đơn hàng của tôi
           </p>
-          <p className="text-body-md sm:text-title-lg text-nav-muted">
+          <p className="text-title-sm sm:text-title-lg text-nav-muted">
             Danh sách các đơn hàng của người dùng
           </p>
         </div>
@@ -234,7 +234,7 @@ const MyOrders = () => {
                     className="flex flex-col justify-between gap-y-3 p-4 bg-surface-white border border-gray-200 rounded-[12px] shadow-sm hover:cursor-pointer active:scale-[0.99] transition-all"
                   >
                     <div className="flex justify-between items-start gap-x-2 border-b border-gray-100 pb-2.5">
-                      <div className="flex flex-col min-w-0">
+                      <div className="flex flex-col gap-y-1 min-w-0">
                         <span className="text-title-lg text-nav-muted">
                           Mã đơn hàng
                         </span>
@@ -243,7 +243,7 @@ const MyOrders = () => {
                         </span>
                       </div>
                       <span
-                        className={`text-title-lg font-medium rounded-full px-2.5 py-0.5 shrink-0 ${
+                        className={`text-title-sm font-medium rounded-full px-2.5 py-0.5 shrink-0 ${
                           value.payment_status === "PENDING"
                             ? "text-yellow-700 bg-yellow-100"
                             : value.payment_status === "PARTIAL_PAID"
@@ -278,7 +278,7 @@ const MyOrders = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex justify-between items-center p-2.5 rounded-[8px] mt-1">
+                    <div className="flex justify-between items-center rounded-[8px] mt-1">
                       <div className="flex flex-col">
                         <span className="text-title-lg text-nav-muted">
                           Tổng tiền

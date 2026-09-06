@@ -49,7 +49,7 @@ const ListCourses = ({ courses, isLoading }) => {
                         src={value?.course?.user_id?.avatar}
                         alt=""
                       />
-                      <p className="text-body-lg text-nav-muted">
+                      <p className="text-body-lg text-nav-muted wrap-break-word">
                         {value?.course?.user_id?.full_name}
                       </p>
                     </div>
@@ -57,7 +57,7 @@ const ListCourses = ({ courses, isLoading }) => {
                   {isLoading ? (
                     <Skeleton height={30} />
                   ) : (
-                    <p className="text-headline-sm text-surface-nav font-medium hover:text-brand-blue transition-transform duration-300">
+                    <p className="text-headline-sm text-surface-nav font-medium hover:text-brand-blue transition-transform duration-300 wrap-break-word">
                       {value?.course?.course_name}
                     </p>
                   )}

@@ -192,7 +192,7 @@ const InstructorCourses = () => {
         </div>
         <div className="flex flex-col gap-y-6">
           {isLoading ? (
-            <p className="text-title-lg text-surface-nav text-center">
+            <p className="text-title-lg text-surface-nav text-center mt-2">
               Đang tải dữ liệu...
             </p>
           ) : myCourses?.arrayCourse?.length == 0 ? (
@@ -229,7 +229,7 @@ const InstructorCourses = () => {
                                 alt=""
                               />
                               <div>
-                                <p className="text-surface-nav text-title-lg font-medium">
+                                <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                   {value.course?.course_name}
                                 </p>
                                 <p className="text-nav-muted text-body-lg">
@@ -383,15 +383,15 @@ const InstructorCourses = () => {
                         key={value.course?._id}
                         className="flex flex-col gap-y-3 p-4 border border-gray-300 rounded-[16px] bg-surface-white shadow-sm"
                       >
-                        <div className="flex justify-between items-start gap-x-3">
+                        <div className="flex flex-col gap-y-2 md:flex-row md:justify-between md:items-start md:gap-x-3">
                           <div className="flex gap-x-3 items-center min-w-0">
                             <img
                               src={value.course?.image_url}
                               className="w-[80px] h-[80px] rounded-[8px] object-contain shrink-0"
                               alt=""
                             />
-                            <div className="min-w-0">
-                              <p className="text-surface-nav text-title-lg font-medium break-words">
+                            <div>
+                              <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                 {value.course?.course_name}
                               </p>
                               <p className="text-nav-muted text-body-lg">
@@ -401,7 +401,7 @@ const InstructorCourses = () => {
                           </div>
 
                           <span
-                            className={`text-body-md font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
+                            className={`text-center text-body-md font-medium rounded-[8px] px-2.5 py-1 shrink-0 ${
                               value.course?.status === "draft"
                                 ? "text-surface-nav bg-gray-200"
                                 : value.course?.status === "pending"
@@ -414,7 +414,7 @@ const InstructorCourses = () => {
                             {value.course?.status}
                           </span>
                         </div>
-                        <div className="flex justify-between gap-2 pt-3 p-2.5 rounded-[12px]">
+                        <div className="flex justify-between rounded-[12px]">
                           <div className="flex flex-col items-center">
                             <span className="text-nav-muted text-body-lg">
                               Học viên

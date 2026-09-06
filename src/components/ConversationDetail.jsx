@@ -69,7 +69,7 @@ const ConversationDetail = ({
     <>
       {isClicked && (
         <div
-          className={`w-[350px] border fixed right-5 bg-surface-white z-10 ${
+          className={`w-[300px] md:w-[350px] border fixed right-5 bg-surface-white z-10 ${
             isDropdown ? "top-20" : "bottom-20"
           } border-none shadow-md rounded-[16px]`}
         >
@@ -89,7 +89,7 @@ const ConversationDetail = ({
                   alt=""
                 />
                 <div className="flex flex-col">
-                  <p className="font-medium l text-title-sm">
+                  <p className="font-medium l text-title-sm wrap-break-word">
                     {conversationInfo?.userFullName}
                   </p>
                   <p className="text-body-md">
@@ -128,7 +128,7 @@ const ConversationDetail = ({
                         onClick={() =>
                           navigate(`/course/${conversationInfo?.courseId}`)
                         }
-                        className="text-title-sm font-medium hover:underline hover:cursor-pointer"
+                        className="text-title-sm font-medium hover:underline hover:cursor-pointer wrap-break-word"
                       >
                         {conversationInfo?.courseName}
                       </p>
@@ -143,7 +143,7 @@ const ConversationDetail = ({
                         alt=""
                       />
                       <div className="flex flex-col gap-y-1">
-                        <p className="text-body-lg font-medium">
+                        <p className="text-body-lg font-medium wrap-break-word">
                           {conversationInfo?.userFullName}
                         </p>
                         <p

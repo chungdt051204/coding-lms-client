@@ -178,7 +178,7 @@ const InstructorDashboard = () => {
                             alt=""
                           />
                           <div className="flex flex-col gap-y-1">
-                            <p className="text-title-lg text-surface-nav font-medium">
+                            <p className="text-title-lg text-surface-nav font-medium wrap-break-word">
                               {value.course_name}
                             </p>
                             <div className="flex gap-x-1 items-center text-title-sm">

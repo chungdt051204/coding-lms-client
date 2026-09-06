@@ -115,7 +115,7 @@ const ChatBotAI = () => {
         </button>
       )}
       {isClicked && (
-        <div className="fixed bottom-20 right-5 bg-surface-white w-[380px] rounded-[16px] shadow-md">
+        <div className="fixed bottom-20 right-5 bg-surface-white w-[300px] md:w-[380px] rounded-[16px] shadow-md">
           <div className="p-4 bg-blue-500 h-[80px] rounded-t-[16px]">
             <div className="flex justify-between items-start">
               <div className="flex gap-x-4">
@@ -243,7 +243,7 @@ const ChatBotAI = () => {
                                           alt=""
                                         />
                                         <div>
-                                          <p className="text-title-sm text-surface-nav font-medium">
+                                          <p className="text-title-sm text-surface-nav font-medium wrap-break-word">
                                             {value?.course_name}
                                           </p>
                                           <div className="flex flex-col text-body-md text-surface-nav">
@@ -315,7 +315,7 @@ const ChatBotAI = () => {
                                           alt=""
                                         />
                                         <div>
-                                          <p className="text-title-sm text-surface-nav font-medium">
+                                          <p className="text-title-sm text-surface-nav font-medium wrap-break-word">
                                             {value?.course_id?.course_name}
                                           </p>
                                           <div className="flex gap-x-3 text-body-md text-surface-nav">

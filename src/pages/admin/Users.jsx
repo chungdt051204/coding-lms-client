@@ -80,7 +80,7 @@ const Users = () => {
   return (
     <>
       <div className="w-[100%] px-6 md:px-8 py-8">
-        <div className="h-[70px] flex flex-col justify-between">
+        <div className="flex flex-col gap-y-1">
           <p className="text-display-sm text-surface-nav font-bold">
             Quản lý người dùng
           </p>
@@ -125,7 +125,9 @@ const Users = () => {
         </div>
         <div className="flex flex-col gap-y-6">
           {isLoading ? (
-            <p>Đang tải dữ liệu...</p>
+            <p className="text-title-lg text-surface-nav text-center mt-2">
+              Đang tải dữ liệu...
+            </p>
           ) : users?.arrayUser?.length == 0 ? (
             <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
               <LuInbox className="text-display-md text-gray-300" />
@@ -159,7 +161,7 @@ const Users = () => {
                               alt=""
                             />
                             <div>
-                              <p className="text-surface-nav text-title-lg font-medium">
+                              <p className="text-surface-nav text-title-lg font-medium truncate">
                                 {value?.item?.full_name}
                               </p>
                               <p className="text-nav-muted text-body-lg">
@@ -245,11 +247,11 @@ const Users = () => {
                               className="w-[60px] h-[60px] rounded-full object-cover shrink-0"
                               alt=""
                             />
-                            <div className="min-w-0">
-                              <p className="text-surface-nav text-title-lg font-medium break-words">
+                            <div>
+                              <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                 {value?.item?.full_name}
                               </p>
-                              <p className="text-nav-muted text-body-lg break-all">
+                              <p className="text-nav-muted text-body-lg">
                                 {value?.item?.email}
                               </p>
                             </div>
