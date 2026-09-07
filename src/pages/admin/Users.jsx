@@ -160,11 +160,11 @@ const Users = () => {
                               referrerPolicy="no-referrer"
                               alt=""
                             />
-                            <div>
-                              <p className="text-surface-nav text-title-lg font-medium truncate">
+                            <div className="min-w-0">
+                              <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
                                 {value?.item?.full_name}
                               </p>
-                              <p className="text-nav-muted text-body-lg">
+                              <p className="text-nav-muted text-body-lg wrap-break-word">
                                 {value?.item?.email}
                               </p>
                             </div>

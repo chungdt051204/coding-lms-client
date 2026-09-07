@@ -28,11 +28,6 @@ const MyOrders = () => {
       icon: <IoListOutline />,
     },
     {
-      status: "PENDING",
-      title: "Chờ thanh toán",
-      icon: <GoClock />,
-    },
-    {
       status: "PARTIAL_PAID",
       title: "Thanh toán một phần",
       icon: <LuCircleDollarSign />,
@@ -104,14 +99,12 @@ const MyOrders = () => {
           {filterTabs?.map((value, index) => {
             const borderBottomColors = [
               "border-b-2 border-b-gray-600",
-              "border-b-2 border-b-yellow-600",
               "border-b-2 border-b-blue-600",
               "border-b-2 border-b-green-600",
               "border-b-2 border-b-red-600",
             ];
             const textColors = [
               "text-gray-600",
-              "text-yellow-600",
               "text-blue-600",
               "text-green-600",
               "text-red-600",
