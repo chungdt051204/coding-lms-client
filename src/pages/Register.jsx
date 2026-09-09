@@ -5,6 +5,7 @@ import { authService } from "../services/authService";
 import { validateForm } from "../../helper/validateForm";
 import { toast } from "react-toastify";
 import { IoBookOutline } from "react-icons/io5";
+import loading from "../assets/loading.gif";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const Register = () => {
     errorEmail: "",
     errorPassword: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
   const handleRegister = async (e) => {
     e.preventDefault();
     const data = {
@@ -37,6 +39,7 @@ const Register = () => {
       return;
     }
     try {
+      setIsLoading(true);
       const result = await authService.Register({ data: formData });
       toast.success(result?.message || "Đăng ký tài khoản thành công");
       setTimeout(() => {
@@ -48,6 +51,8 @@ const Register = () => {
       if (status === 409)
         setError((prev) => ({ ...prev, errorEmail: message }));
       console.log(status, message);
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -157,41 +162,46 @@ const Register = () => {
               >
                 Bạn muốn đăng ký với vai trò
               </label>
-              <div className="flex flex-col justify-between gap-2 lg:gap-0 min-h-[100px] lg:h-[100px]">
-                {rolesDisplay?.map((value) => {
-                  return (
-                    <div
-                      key={value._id}
-                      className="flex flex-wrap sm:flex-nowrap items-center p-2 border border-icon-muted rounded-[8px] cursor-pointer"
-                    >
-                      <input
-                        checked={formData.role === value.role}
-                        value={value.role}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            role: e.target.value,
-                          }))
-                        }
-                        type="radio"
-                      />
-                      <p className="text-body-lg font-medium text-surface-nav ms-2">
-                        {value.role === "user" ? "Học viên" : "Giảng viên"}
-                      </p>
-                      <p className="text-body-sm sm:text-body-md font-medium text-nav-muted ms-2">
-                        {value.role === "user"
-                          ? "Tham gia và học khóa học"
-                          : "Tạo và bán khóa học"}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
+              {roles?.length == 0 ? (
+                <img width={100} className="mx-auto" src={loading} />
+              ) : (
+                <div className="flex flex-col justify-between gap-2 lg:gap-0 min-h-[100px] lg:h-[100px]">
+                  {rolesDisplay?.map((value) => {
+                    return (
+                      <div
+                        key={value._id}
+                        className="flex flex-wrap md:flex-row md:items-center p-2 border border-icon-muted rounded-[8px] cursor-pointer"
+                      >
+                        <input
+                          checked={formData.role === value.role}
+                          value={value.role}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              role: e.target.value,
+                            }))
+                          }
+                          type="radio"
+                        />
+                        <p className="text-body-lg font-medium text-surface-nav ms-2">
+                          {value.role === "user" ? "Học viên" : "Giảng viên"}
+                        </p>
+                        <p className="text-body-sm sm:text-body-md font-medium text-nav-muted ms-2">
+                          {value.role === "user"
+                            ? "Tham gia và học khóa học"
+                            : "Tạo và bán khóa học"}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
             <input
-              className="p-2 border rounded-[8px] mt-[15px] text-title-lg font-medium text-surface-white bg-surface-nav hover:cursor-pointer hover:text-surface-bg"
+              disabled={isLoading}
+              className="p-2 border rounded-[8px] mt-[15px] text-title-sm md:text-title-lg font-medium text-surface-white bg-surface-nav hover:cursor-pointer hover:text-surface-bg"
               type="submit"
-              value="Đăng ký"
+              value={isLoading ? "Đang xử lý..." : "Đăng ký"}
             />
           </form>
           <div className="flex justify-center mt-[10px] mx-auto">

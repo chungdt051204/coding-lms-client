@@ -273,7 +273,7 @@ const MyProfile = () => {
               </p>
               <button
                 onClick={handleUpdateAvatar}
-                className="flex justify-center px-2 py-1 mt-2 rounded-[8px] bg-surface-nav text-title-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                className="flex justify-center px-2 py-1 mt-2 rounded-[8px] bg-surface-nav text-title-sm md:text-title-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
               >
                 <div className="flex gap-x-2 items-center">
                   <LuSave />
@@ -399,7 +399,7 @@ const MyProfile = () => {
                 <button
                   type="button"
                   onClick={handleUpdateProfile}
-                  className="flex justify-center w-full md:w-[35%] px-2 py-1 mt-2 rounded-[8px] bg-surface-nav text-title-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                  className="flex justify-center w-full md:w-[35%] px-2 py-1 mt-2 rounded-[8px] bg-surface-nav text-title-sm md:text-title-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
                 >
                   <div className="flex gap-x-2 items-center">
                     <LuSave />
@@ -466,7 +466,7 @@ const MyProfile = () => {
                 <button
                   type="button"
                   onClick={handleChangePassword}
-                  className="flex justify-center w-full md:w-[35%] px-2 py-1 mt-2 rounded-[8px] bg-surface-nav text-title-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                  className="flex justify-center w-full md:w-[35%] px-2 py-1 mt-2 rounded-[8px] bg-surface-nav text-title-sm md:text-title-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
                 >
                   <div className="flex gap-x-2 items-center">
                     <MdLockOutline />

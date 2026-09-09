@@ -137,7 +137,7 @@ const Comments = () => {
                     <tr className="flex items-center justify-between text-surface-nav font-medium border-b border-surface-bg">
                       <td className="w-[25%] p-2">Người dùng</td>
                       <td className="w-[15%]">Khóa học</td>
-                      <td className="w-[25%]">Bình luận</td>
+                      <td className="w-[20%]">Bình luận</td>
                       <td className="w-[15%] text-center">Trạng thái</td>
                       <td className="w-[20%] p-2 text-right">Thao tác</td>
                     </tr>
@@ -161,10 +161,10 @@ const Comments = () => {
                                 {value?.user_id?.full_name}
                               </p>
                             </td>
-                            <td className="w-[15%] text-title-sm text-surface-nav wrap-break-word">
+                            <td className="w-[15%] text-title-sm text-surface-nav">
                               <p>{value?.course_id?.course_name}</p>
                             </td>
-                            <td className="w-[25%] text-title-sm text-surface-nav wrap-break-word">
+                            <td className="w-[20%] text-title-sm text-surface-nav wrap-break-word">
                               <p>{value?.comment}</p>
                             </td>
                             <td className="w-[15%] px-2">

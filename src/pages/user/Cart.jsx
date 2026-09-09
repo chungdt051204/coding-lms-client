@@ -164,7 +164,7 @@ const Cart = () => {
           </div>
         ) : (
           <div>
-            <div className="flex justify-between mt-8">
+            <div className="flex flex-col gap-y-3 md:flex-row md:justify-between mt-8">
               <div className="flex gap-x-2 items-center">
                 <input
                   checked={cartItemIds?.length == myCart?.items?.length}
@@ -177,7 +177,7 @@ const Cart = () => {
               </div>
               <button
                 onClick={handleDeleteCartItemsSelected}
-                className={`flex gap-x-4 items-center text-body-lg text-surface-white font-medium py-2 px-3 bg-brand-primary ${
+                className={`flex gap-x-4 items-center justify-center w-[70%] md:w-auto text-body-lg text-surface-white font-medium py-2 px-3 bg-brand-primary ${
                   cartItemIds?.length === 0
                     ? "opacity-80 hover:cursor-not-allowed"
                     : "hover:cursor-pointer transition-transform duration-300 hover:bg-red-700 hover:text-surface-bg"
@@ -192,14 +192,14 @@ const Cart = () => {
                 return (
                   <div
                     key={value?._id}
-                    className={`flex flex-col items-end gap-y-2 md:flex-row md:justify-between md:items-center ${
+                    className={`flex flex-col gap-y-3 md:flex-row md:justify-between md:items-center ${
                       cartItemIds?.includes(value._id)
                         ? "border-2 border-brand-blue"
                         : "border border-gray-300"
                     } rounded-[16px] p-5`}
                   >
-                    <div className="flex gap-x-8">
-                      <div className="flex items-center gap-x-2">
+                    <div className="flex flex-col gap-y-4 md:flex-row gap-x-8">
+                      <div className="flex items-center gap-x-4 md:gap-x-2">
                         <input
                           checked={cartItemIds.includes(value._id)}
                           onChange={() =>
@@ -217,11 +217,11 @@ const Cart = () => {
                         />
                       </div>
                       <div className="flex flex-col gap-y-1 text-body-lg text-surface-nav font-medium">
-                        <p className="text-headline-md text-brand-blue wrap-break-word">
+                        <p className="text-headline-sm md:text-headline-md text-brand-blue wrap-break-word">
                           {value?.course_id?.course_name}
                         </p>
-                        <div className="flex flex-col md:flex-row md:gap-x-8 text-body-lg">
-                          <div className="flex flex-col gap-y-1">
+                        <div className="flex flex-col gap-y-1 md:flex-row md:gap-x-8 text-body-lg">
+                          <div className="flex gap-x-2 md:flex-col md:gap-y-1">
                             <div className="flex gap-x-1">
                               <input
                                 checked={
@@ -249,7 +249,7 @@ const Cart = () => {
                               đ)
                             </p>
                           </div>
-                          <div className="flex flex-col gap-y-1">
+                          <div className="flex gap-x-2 md:flex-col md:gap-y-1">
                             <div className="flex gap-x-1">
                               <input
                                 checked={
@@ -278,7 +278,7 @@ const Cart = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-x-4 text-headline-sm">
+                    <div className="flex gap-x-4 text-headline-sm justify-end md:justify-start">
                       <p className="text-brand-blue font-bold">
                         {format.formatPrice({ price: value?.course_id?.price })}
                         đ
@@ -296,7 +296,7 @@ const Cart = () => {
               })}
             </div>
             <div className="flex flex-col gap-y-4 md:flex-row md:justify-between md:items-center p-5 border border-gray-300 rounded-[16px] mt-5">
-              <div className="flex justify-between items-center md:flex-col md:gap-y-1">
+              <div className="flex flex-col gap-y-1 md:flex-row md:gap-x-8 md:items-center">
                 <p className="text-body-lg text-nav-muted">
                   Đã chọn {cartItemIds?.length} khóa học
                 </p>
@@ -326,7 +326,9 @@ const Cart = () => {
         <form onSubmit={handleCheckout} className="flex flex-col gap-y-4">
           <div className="flex flex-col gap-y-3 text-surface-nav font-medium">
             <div className="flex justify-between">
-              <p className="text-headline-md">Xác nhận thanh toán</p>
+              <p className="text-headline-sm md:text-headline-md">
+                Xác nhận thanh toán
+              </p>
               <button
                 className="text-title-lg"
                 onClick={() => dialogRef?.current?.close()}
@@ -421,11 +423,11 @@ const Cart = () => {
             </div>
           </div>
           <div className="p-4 bg-blue-50 rounded-[8px]">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col gap-y-1 md:flex-row md:justify-between md:items-center">
               <p className="text-title-lg text-surface-nav font-medium">
                 Tổng thanh toán
               </p>
-              <p className="text-headline-md text-brand-blue font-bold">
+              <p className="text-headline-sm md:text-headline-md text-brand-blue font-bold">
                 {format.formatPrice({ price: appliedAmount() })}đ
               </p>
             </div>

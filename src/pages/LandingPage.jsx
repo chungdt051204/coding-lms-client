@@ -13,6 +13,7 @@ import ListCourses from "../components/ListCourses";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ChatBotAI from "../components/ChatBotAI";
+import loading from "../assets/loading.gif";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -169,46 +170,54 @@ const LandingPage = () => {
               Khám phá các chủ đề lập trình hàng đầu
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:flex xl:justify-between gap-4 md:gap-6 xl:gap-0">
-            {categories?.map((value, index) => {
-              const bgColors = ["bg-blue-100", "bg-purple-100", "bg-green-100"];
-              const iconColors = [
-                "text-brand-blue",
-                "text-purple-500",
-                "text-green-500",
-              ];
-              const colorIdx = index % 3;
-              return (
-                <div
-                  onClick={() =>
-                    navigate(
-                      `/courses?search=${encodeURIComponent(
-                        value.item.category_name
-                      )}`
-                    )
-                  }
-                  key={index}
-                  className="flex flex-col gap-y-4 w-full xl:w-[32%] border border-surface-bg rounded-[16px] bg-surface-white py-6 md:py-8 text-center transition-all duration-300 hover:shadow-lg hover:cursor-pointer"
-                >
+          {categories?.length == 0 ? (
+            <img width={100} className="mx-auto" src={loading} />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:flex xl:justify-between gap-4 md:gap-6 xl:gap-0">
+              {categories?.map((value, index) => {
+                const bgColors = [
+                  "bg-blue-100",
+                  "bg-purple-100",
+                  "bg-green-100",
+                ];
+                const iconColors = [
+                  "text-brand-blue",
+                  "text-purple-500",
+                  "text-green-500",
+                ];
+                const colorIdx = index % 3;
+                return (
                   <div
-                    className={`mx-auto py-3 px-3 md:py-4 md:px-4 rounded-[16px] ${bgColors[colorIdx]}`}
+                    onClick={() =>
+                      navigate(
+                        `/courses?search=${encodeURIComponent(
+                          value.item.category_name
+                        )}`
+                      )
+                    }
+                    key={index}
+                    className="flex flex-col gap-y-4 w-full xl:w-[32%] border border-surface-bg rounded-[16px] bg-surface-white py-6 md:py-8 text-center transition-all duration-300 hover:shadow-lg hover:cursor-pointer"
                   >
-                    <IoBookOutline
-                      className={`text-display-sm md:text-display-md ${iconColors[colorIdx]} font-medium`}
-                    />
+                    <div
+                      className={`mx-auto py-3 px-3 md:py-4 md:px-4 rounded-[16px] ${bgColors[colorIdx]}`}
+                    >
+                      <IoBookOutline
+                        className={`text-display-sm md:text-display-md ${iconColors[colorIdx]} font-medium`}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-y-1 px-4">
+                      <p className="text-headline-sm text-surface-nav font-medium">
+                        {value.item.category_name}
+                      </p>
+                      <p className="text-body-md md:text-body-lg text-nav-muted">
+                        {value.numberCourse} khóa học
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-y-1 px-4">
-                    <p className="text-headline-sm text-surface-nav font-medium">
-                      {value.item.category_name}
-                    </p>
-                    <p className="text-body-md md:text-body-lg text-nav-muted">
-                      {value.numberCourse} khóa học
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
       {me && <ChatBotAI />}

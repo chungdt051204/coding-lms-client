@@ -239,7 +239,7 @@ const OrderDetail = () => {
           <div className="flex flex-col gap-y-3 p-4 sm:p-5 border border-gray-300 rounded-[16px] w-full xl:w-[38%] bg-surface-white">
             <div className="flex gap-x-2 items-center text-title-lg font-medium">
               <IoBookOutline className="text-brand-blue shrink-0" />
-              <p className="text-surface-nav text-title-sm">
+              <p className="text-surface-nav text-title-sm md:text-title-lg">
                 Các khóa học trong đơn hàng ({order?.orderItems?.length || 0})
               </p>
             </div>
@@ -256,7 +256,7 @@ const OrderDetail = () => {
                     className="w-[80px] h-[60px] sm:w-[100px] sm:h-[80px] object-cover rounded-[8px] shrink-0"
                   />
                   <div className="flex flex-col gap-y-1 min-w-0">
-                    <p className="text-body-lg sm:text-headline-sm text-surface-nav font-medium wrap-break-word">
+                    <p className="text-headline-sm text-surface-nav font-medium wrap-break-word">
                       {value.course_name}
                     </p>
                     <div className="flex items-center gap-x-2">
@@ -277,7 +277,7 @@ const OrderDetail = () => {
           order?.item?.payment_status === "PARTIAL_PAID" && (
             <button
               onClick={handleProcessPayment}
-              className="w-full sm:w-auto py-3 px-8 self-center xl:self-end bg-surface-nav text-title-md sm:text-title-lg text-surface-white font-medium rounded-[8px] transition-transform duration-300 hover:cursor-pointer hover:opacity-90 active:scale-[0.99]"
+              className="w-full sm:w-auto py-3 px-8 self-center xl:self-end bg-surface-nav text-title-sm md:text-title-lg text-surface-white font-medium rounded-[8px] transition-transform duration-300 hover:cursor-pointer hover:opacity-90 active:scale-[0.99]"
             >
               Thanh toán nốt số tiền còn lại
             </button>

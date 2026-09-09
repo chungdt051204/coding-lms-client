@@ -348,7 +348,7 @@ const InstructorDetail = () => {
                   </div>
                 </div>
                 <input
-                  className="px-2 py-1 rounded-[8px] bg-surface-nav text-title-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                  className="px-2 py-1 rounded-[8px] bg-surface-nav text-title-sm md:text-title-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
                   type="submit"
                   value="Lưu thay đổi"
                 />

@@ -17,6 +17,7 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState({ errorEmail: "", errorPassword: "" });
   const [errorLogin, setErrorLogin] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const handleLogin = async (e) => {
     e.preventDefault();
     const data = { email: formData.email, password: formData.password };
@@ -28,6 +29,7 @@ const Login = () => {
     )
       return;
     try {
+      setIsLoading(true);
       const result = await authService.Login({ data: formData });
       sessionStorage.setItem("token", result.token);
       dispatch(setIsLogin(true));
@@ -51,6 +53,8 @@ const Login = () => {
       if (status === 403) setErrorLogin(message);
       if (status === 429)
         setErrorLogin("Quá nhiều lần thử! Vui lòng thử lại sau 15 phút!");
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -132,9 +136,10 @@ const Login = () => {
               )}
             </div>
             <input
-              className="p-2 border rounded-[8px] mt-[15px] text-title-lg font-medium text-surface-white bg-surface-nav hover:cursor-pointer hover:text-surface-bg"
+              disabled={isLoading}
+              className="p-2 border rounded-[8px] mt-[15px] text-title-sm md:text-title-lg font-medium text-surface-white bg-surface-nav hover:cursor-pointer hover:text-surface-bg"
               type="submit"
-              value="Đăng nhập"
+              value={isLoading ? "Đang xử lý..." : "Đăng nhập"}
             />
           </form>
           {/* Google Button */}

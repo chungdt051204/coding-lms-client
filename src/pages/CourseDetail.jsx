@@ -88,6 +88,7 @@ const CourseDetail = () => {
     courseName: course?.item?.course_name,
     messages: conversation?.messages,
   };
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     if (id) {
       const getCourseById = async () => {
@@ -187,6 +188,7 @@ const CourseDetail = () => {
       return;
     }
     try {
+      setIsLoading(true);
       const result = await enrollmentService.createEnrollment({
         data: { courseId: id, accessLevel: "UNLIMITED" },
       });
@@ -198,6 +200,8 @@ const CourseDetail = () => {
       const status = error.status;
       const message = error.data.message;
       console.log(status, message);
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleAddToCart = async () => {
@@ -210,6 +214,7 @@ const CourseDetail = () => {
       return;
     }
     try {
+      setIsLoading(true);
       const result = await cartService.addToCart({ courseId: id });
       console.log(result.data);
       dispatch(addToCart(result.data));
@@ -218,6 +223,8 @@ const CourseDetail = () => {
       const status = error.status;
       const message = error.data.message;
       console.log(status, message);
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleRating = async () => {
@@ -293,7 +300,7 @@ const CourseDetail = () => {
                   {course?.item?.level || ""}
                 </div>
               </div>
-              <p className="text-headline-lg sm:text-display-md xl:text-display-lg text-surface-white font-medium wrap-break-word">
+              <p className="text-headline-md md:text-display-md text-surface-white font-medium wrap-break-word">
                 {course?.item?.course_name || ""}
               </p>
               <p className="text-body-md sm:text-title-lg xl:text-headline-sm text-surface-bg">
@@ -344,6 +351,7 @@ const CourseDetail = () => {
               </p>
               {!enrolledCourse && !isAdmin && !isInstructor && (
                 <button
+                  disabled={isLoading}
                   onClick={
                     course?.item?.is_free
                       ? handleCreateEnrollment
@@ -351,7 +359,9 @@ const CourseDetail = () => {
                   }
                   className="w-full bg-surface-nav py-3 xl:py-2 text-title-md sm:text-headline-sm text-surface-white rounded-[8px] transition-transform duration-300 hover:cursor-pointer hover:text-surface-bg active:scale-[0.99]"
                 >
-                  {course?.item?.is_free
+                  {isLoading
+                    ? "Đang xử lý..."
+                    : course?.item?.is_free
                     ? "Đăng ký học ngay"
                     : courseInCart
                     ? "Đã thêm vào giỏ hàng"
