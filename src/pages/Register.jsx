@@ -164,7 +164,7 @@ const Register = () => {
                 Bạn muốn đăng ký với vai trò
               </label>
               {roles?.length == 0 ? (
-                <div className="py-16 text-center">
+                <div className="pt-16 text-center">
                   <Ring2
                     size="40"
                     stroke="5"
