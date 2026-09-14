@@ -7,6 +7,8 @@ import {
   deleteCartItemsSelected,
 } from "../../stores/features/cartSlice";
 import { toast } from "react-toastify";
+import { Ring2 } from "ldrs/react";
+import "ldrs/react/Ring2.css";
 import { format } from "../../../helper/format";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FiUser } from "react-icons/fi";
@@ -57,8 +59,14 @@ const Cart = () => {
       return;
     }
     if (!isLoading && me?.role_id?.role !== "user") {
-      navigate("/");
-      return;
+      if (me?.role_id?.role == "admin") {
+        navigate("/admin/dashboard");
+        return;
+      }
+      if (me?.role_id?.role == "instructor") {
+        navigate("/instructor/dashboard");
+        return;
+      }
     }
   }, [isLoading, me, navigate]);
   const handleToggleAllCartItems = () => {
@@ -146,181 +154,197 @@ const Cart = () => {
       setLoading(false);
     }
   };
-  if (isLoading) return <div className="text-center">Đang tải dữ liệu...</div>;
   return (
     <>
       <Navbar />
-      <div className="py-24 px-8 md:px-16 xl:px-32 h-auto">
-        <div className="flex flex-col gap-y-1">
-          <p className="text-display-sm text-surface-nav font-bold">Giỏ hàng</p>
-          <p className="text-body-lg text-nav-muted">
-            {myCart?.items?.length} khóa học trong giỏ hàng
-          </p>
+      {isLoading ? (
+        <div className="my-[50vh] h-[100vh] text-center">
+          <Ring2
+            size="40"
+            stroke="5"
+            strokeLength="0.25"
+            bgOpacity="0.1"
+            speed="0.8"
+            color="blue"
+          />
         </div>
-        {myCart?.items?.length == 0 ? (
-          <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6 h-[100vh]">
-            <LuInbox className="text-display-md text-gray-300" />
-            <p>Giỏ hàng của bạn hiện tại đang trống</p>
+      ) : (
+        <div className="py-24 px-8 md:px-16 xl:px-32 h-auto">
+          <div className="flex flex-col gap-y-1">
+            <p className="text-display-sm text-surface-nav font-bold">
+              Giỏ hàng
+            </p>
+            <p className="text-body-lg text-nav-muted">
+              {myCart?.items?.length} khóa học trong giỏ hàng
+            </p>
           </div>
-        ) : (
-          <div>
-            <div className="flex flex-col gap-y-3 md:flex-row md:justify-between mt-8">
-              <div className="flex gap-x-2 items-center">
-                <input
-                  checked={cartItemIds?.length == myCart?.items?.length}
-                  onChange={handleToggleAllCartItems}
-                  type="checkbox"
-                />
-                <p className="text-body-lg text-surface-nav font-medium">
-                  Chọn tất cả ({myCart?.items?.length})
-                </p>
-              </div>
-              <button
-                onClick={handleDeleteCartItemsSelected}
-                className={`flex gap-x-4 items-center justify-center w-[70%] md:w-auto text-body-lg text-surface-white font-medium py-2 px-3 bg-brand-primary ${
-                  cartItemIds?.length === 0
-                    ? "opacity-80 hover:cursor-not-allowed"
-                    : "hover:cursor-pointer transition-transform duration-300 hover:bg-red-700 hover:text-surface-bg"
-                } rounded-[8px]`}
-              >
-                <RiDeleteBinLine />
-                <p> Xóa đã chọn ({cartItemIds?.length})</p>
-              </button>
+          {myCart?.items?.length == 0 ? (
+            <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6 h-[100vh]">
+              <LuInbox className="text-display-md text-gray-300" />
+              <p>Giỏ hàng của bạn hiện tại đang trống</p>
             </div>
-            <div className="flex flex-col gap-y-4 mt-5">
-              {myCart?.items?.map((value) => {
-                return (
-                  <div
-                    key={value?._id}
-                    className={`flex flex-col gap-y-3 md:flex-row md:justify-between md:items-center ${
-                      cartItemIds?.includes(value._id)
-                        ? "border-2 border-brand-blue"
-                        : "border border-gray-300"
-                    } rounded-[16px] p-5`}
-                  >
-                    <div className="flex flex-col gap-y-4 md:flex-row gap-x-8">
-                      <div className="flex items-center gap-x-4 md:gap-x-2">
-                        <input
-                          checked={cartItemIds.includes(value._id)}
-                          onChange={() =>
-                            handleToggleCartItemSelected({
-                              cartItemId: value._id,
-                            })
-                          }
-                          type="checkbox"
-                        />
-                        <img
-                          src={value?.course_id?.image_url}
-                          alt=""
-                          width={100}
-                          height={80}
-                        />
-                      </div>
-                      <div className="flex flex-col gap-y-1 text-body-lg text-surface-nav font-medium">
-                        <p className="text-headline-sm md:text-headline-md text-brand-blue wrap-break-word">
-                          {value?.course_id?.course_name}
-                        </p>
-                        <div className="flex flex-col gap-y-1 md:flex-row md:gap-x-8 text-body-lg">
-                          <div className="flex gap-x-2 md:flex-col md:gap-y-1">
-                            <div className="flex gap-x-1">
-                              <input
-                                checked={
-                                  paymentOptions[value._id] === "PARTIAL"
-                                }
-                                onChange={(e) =>
-                                  setPaymentOptions((prev) => ({
-                                    ...prev,
-                                    [value._id]: e.target.value,
-                                  }))
-                                }
-                                value="PARTIAL"
-                                type="radio"
-                                name={`paymentType-${value._id}`}
-                              />
-                              <p>Thanh toán 50%</p>
+          ) : (
+            <div>
+              <div className="flex flex-col gap-y-3 md:flex-row md:justify-between mt-8">
+                <div className="flex gap-x-2 items-center">
+                  <input
+                    checked={cartItemIds?.length == myCart?.items?.length}
+                    onChange={handleToggleAllCartItems}
+                    type="checkbox"
+                  />
+                  <p className="text-body-lg text-surface-nav font-medium">
+                    Chọn tất cả ({myCart?.items?.length})
+                  </p>
+                </div>
+                <button
+                  onClick={handleDeleteCartItemsSelected}
+                  className={`flex gap-x-4 items-center justify-center w-[70%] md:w-auto text-body-lg text-surface-white font-medium py-2 px-3 bg-brand-primary ${
+                    cartItemIds?.length === 0
+                      ? "opacity-80 hover:cursor-not-allowed"
+                      : "hover:cursor-pointer transition-transform duration-300 hover:bg-red-700 hover:text-surface-bg"
+                  } rounded-[8px]`}
+                >
+                  <RiDeleteBinLine />
+                  <p> Xóa đã chọn ({cartItemIds?.length})</p>
+                </button>
+              </div>
+              <div className="flex flex-col gap-y-4 mt-5">
+                {myCart?.items?.map((value) => {
+                  return (
+                    <div
+                      key={value?._id}
+                      className={`flex flex-col gap-y-3 md:flex-row md:justify-between md:items-center ${
+                        cartItemIds?.includes(value._id)
+                          ? "border-2 border-brand-blue"
+                          : "border border-gray-300"
+                      } rounded-[16px] p-5`}
+                    >
+                      <div className="flex flex-col gap-y-4 md:flex-row gap-x-8">
+                        <div className="flex items-center gap-x-4 md:gap-x-2">
+                          <input
+                            checked={cartItemIds.includes(value._id)}
+                            onChange={() =>
+                              handleToggleCartItemSelected({
+                                cartItemId: value._id,
+                              })
+                            }
+                            type="checkbox"
+                          />
+                          <img
+                            src={value?.course_id?.image_url}
+                            alt=""
+                            width={100}
+                            height={80}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-y-1 text-body-lg text-surface-nav font-medium">
+                          <p className="text-headline-sm md:text-headline-md text-brand-blue wrap-break-word">
+                            {value?.course_id?.course_name}
+                          </p>
+                          <div className="flex flex-col gap-y-1 md:flex-row md:gap-x-8 text-body-lg">
+                            <div className="flex gap-x-2 md:flex-col md:gap-y-1">
+                              <div className="flex gap-x-1">
+                                <input
+                                  checked={
+                                    paymentOptions[value._id] === "PARTIAL"
+                                  }
+                                  onChange={(e) =>
+                                    setPaymentOptions((prev) => ({
+                                      ...prev,
+                                      [value._id]: e.target.value,
+                                    }))
+                                  }
+                                  value="PARTIAL"
+                                  type="radio"
+                                  name={`paymentType-${value._id}`}
+                                />
+                                <p>Thanh toán 50%</p>
+                              </div>
+                              <p>
+                                (
+                                {format.formatPrice({
+                                  price: getHaftPrice({
+                                    price: value?.course_id?.price,
+                                  }),
+                                })}
+                                đ)
+                              </p>
                             </div>
-                            <p>
-                              (
-                              {format.formatPrice({
-                                price: getHaftPrice({
+                            <div className="flex gap-x-2 md:flex-col md:gap-y-1">
+                              <div className="flex gap-x-1">
+                                <input
+                                  checked={
+                                    paymentOptions[value._id] !== "PARTIAL"
+                                  }
+                                  onChange={(e) =>
+                                    setPaymentOptions((prev) => ({
+                                      ...prev,
+                                      [value._id]: e.target.value,
+                                    }))
+                                  }
+                                  value="FULL"
+                                  type="radio"
+                                  name={`paymentType-${value._id}`}
+                                />
+                                <p>Thanh toán 100%</p>
+                              </div>
+                              <p>
+                                (
+                                {format.formatPrice({
                                   price: value?.course_id?.price,
-                                }),
-                              })}
-                              đ)
-                            </p>
-                          </div>
-                          <div className="flex gap-x-2 md:flex-col md:gap-y-1">
-                            <div className="flex gap-x-1">
-                              <input
-                                checked={
-                                  paymentOptions[value._id] !== "PARTIAL"
-                                }
-                                onChange={(e) =>
-                                  setPaymentOptions((prev) => ({
-                                    ...prev,
-                                    [value._id]: e.target.value,
-                                  }))
-                                }
-                                value="FULL"
-                                type="radio"
-                                name={`paymentType-${value._id}`}
-                              />
-                              <p>Thanh toán 100%</p>
+                                })}
+                                đ)
+                              </p>
                             </div>
-                            <p>
-                              (
-                              {format.formatPrice({
-                                price: value?.course_id?.price,
-                              })}
-                              đ)
-                            </p>
                           </div>
                         </div>
                       </div>
+                      <div className="flex gap-x-4 text-headline-sm justify-end md:justify-start">
+                        <p className="text-brand-blue font-bold">
+                          {format.formatPrice({
+                            price: value?.course_id?.price,
+                          })}
+                          đ
+                        </p>
+                        <button
+                          onClick={() =>
+                            handleDeleteCartItem({ cartItemId: value._id })
+                          }
+                        >
+                          <RiDeleteBinLine className="text-red-500 hover:cursor-pointer" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex gap-x-4 text-headline-sm justify-end md:justify-start">
-                      <p className="text-brand-blue font-bold">
-                        {format.formatPrice({ price: value?.course_id?.price })}
-                        đ
-                      </p>
-                      <button
-                        onClick={() =>
-                          handleDeleteCartItem({ cartItemId: value._id })
-                        }
-                      >
-                        <RiDeleteBinLine className="text-red-500 hover:cursor-pointer" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="flex flex-col gap-y-4 md:flex-row md:justify-between md:items-center p-5 border border-gray-300 rounded-[16px] mt-5">
-              <div className="flex flex-col gap-y-1 md:flex-row md:gap-x-8 md:items-center">
-                <p className="text-body-lg text-nav-muted">
-                  Đã chọn {cartItemIds?.length} khóa học
-                </p>
-                <p className="text-headline-sm md:text-headline-md text-brand-blue font-bold">
-                  Tổng: {format.formatPrice({ price: appliedAmount() })}đ
-                </p>
+                  );
+                })}
               </div>
-              <button
-                onClick={() => dialogRef.current?.showModal()}
-                disabled={cartItemIds?.length === 0}
-                className={`py-2 px-6 rounded-[8px] text-surface-white text-body-lg font-medium ${
-                  cartItemIds?.length === 0
-                    ? "bg-nav-muted hover:cursor-not-allowed"
-                    : "bg-surface-nav transition-transform duration-300 hover:cursor-pointer hover:text-surface-bg"
-                }`}
-              >
-                Thanh toán ({cartItemIds?.length})
-              </button>
+              <div className="flex flex-col gap-y-4 md:flex-row md:justify-between md:items-center p-5 border border-gray-300 rounded-[16px] mt-5">
+                <div className="flex flex-col gap-y-1 md:flex-row md:gap-x-8 md:items-center">
+                  <p className="text-body-lg text-nav-muted">
+                    Đã chọn {cartItemIds?.length} khóa học
+                  </p>
+                  <p className="text-headline-sm md:text-headline-md text-brand-blue font-bold">
+                    Tổng: {format.formatPrice({ price: appliedAmount() })}đ
+                  </p>
+                </div>
+                <button
+                  onClick={() => dialogRef.current?.showModal()}
+                  disabled={cartItemIds?.length === 0}
+                  className={`py-2 px-6 rounded-[8px] text-surface-white text-body-lg font-medium ${
+                    cartItemIds?.length === 0
+                      ? "bg-nav-muted hover:cursor-not-allowed"
+                      : "bg-surface-nav transition-transform duration-300 hover:cursor-pointer hover:text-surface-bg"
+                  }`}
+                >
+                  Thanh toán ({cartItemIds?.length})
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
       <dialog
-        className="w-full lg:w-[45%] mx-auto mt-6 p-6 rounded-[16px]"
+        className="w-full md:w-[75%] lg:w-[45%] mx-auto mt-6 p-6 rounded-[16px]"
         ref={dialogRef}
       >
         <form onSubmit={handleCheckout} className="flex flex-col gap-y-4">
@@ -342,7 +366,7 @@ const Cart = () => {
           <div className="flex flex-col gap-y-2 border border-gray-300 rounded-[16px] p-4 bg-gray-50">
             <div className="flex gap-x-3 items-center">
               <FiUser className="text-title-lg text-nav-muted" />
-              <div className="flex flex-col text-title-sm">
+              <div className="w-[80%] flex flex-col text-title-sm">
                 <p className="text-nav-muted">Họ tên</p>
                 <p className="text-surface-nav font-medium wrap-break-word">
                   {me?.full_name || ""}
@@ -350,10 +374,10 @@ const Cart = () => {
               </div>
             </div>
             <div className="flex gap-x-3 items-center">
-              <MdOutlineEmail className="text-title-lg text-nav-muted" />
-              <div className="flex flex-col text-title-sm">
+              <MdOutlineEmail className="shrink-0 text-title-lg text-nav-muted" />
+              <div className="w-[80%] flex flex-col text-title-sm">
                 <p className="text-nav-muted">Email</p>
-                <p className="text-surface-nav font-medium wrap-break-word">
+                <p className="text-surface-nav font-medium wrap-break-word ">
                   {me?.email || ""}
                 </p>
               </div>
@@ -367,7 +391,7 @@ const Cart = () => {
               {cartItemsSelected?.map((value) => {
                 return (
                   <div
-                    className="flex justify-between items-center py-3 px-4 rounded-[16px] bg-gray-50"
+                    className="flex flex-wrap gap-4 md:flex-row md:justify-between md:items-center py-3 px-4 rounded-[16px] bg-gray-50"
                     key={value?._id}
                   >
                     <div className="flex gap-x-4">

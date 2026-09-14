@@ -1,6 +1,8 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { userService } from "../../services/userService";
+import { Ring2 } from "ldrs/react";
+import "ldrs/react/Ring2.css";
 import { IoEyeOutline } from "react-icons/io5";
 import { LuInbox } from "react-icons/lu";
 import PaginationButton from "../../components/PaginationButton";
@@ -41,63 +43,72 @@ const Students = () => {
             Xem và quản lý học viên đã đăng ký khóa học
           </p>
         </div>
-        <div className="flex flex-col gap-y-6">
-          {isLoading ? (
-            <p className="text-title-lg text-surface-nav text-center mt-2">
-              Đang tải dữ liệu...
-            </p>
-          ) : students?.items?.length == 0 ? (
-            <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
-              <LuInbox className="text-display-md text-gray-300" />
-              <p>Chưa có học viên nào</p>
-            </div>
-          ) : (
-            <table className="border-separate border-spacing-0 overflow-hidden border-1 border-surface-bg rounded-[16px] mt-6">
-              <thead>
-                <tr className="flex items-center justify-between text-surface-nav font-medium">
-                  <td className="w-[50%] p-2">Học viên</td>
-                  <td className="w-[30%] p-2 text-right">Thao tác</td>
-                </tr>
-              </thead>
-              <tbody>
-                {students?.items?.map((value) => {
-                  return (
-                    <tr
-                      className="flex justify-between items-center border border-surface-bg hover:bg-surface-bg"
-                      key={value._id}
-                    >
-                      <td className="flex items-center gap-x-2 w-[60%] p-2">
-                        <img
-                          className="w-[50px] h-[50px] rounded-[1000px] object-contain shrink-0"
-                          src={value.avatar}
-                          referrerPolicy="no-referrer"
-                        />
-                        <div>
-                          <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
-                            {value.full_name}
-                          </p>
-                          <p className="text-nav-muted text-body-lg wrap-break-word">
-                            {value.email}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="flex justify-end gap-x-2 items-center w-[25%] pe-2">
-                        <IoEyeOutline
-                          onClick={() =>
-                            navigate(`/instructor/student/${value._id}`)
-                          }
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-          {students?.totalPages > 1 && (
-            <PaginationButton totalPages={students?.totalPages} />
-          )}
-        </div>
+        {isLoading ? (
+          <div className="py-32 text-center">
+            <Ring2
+              size="40"
+              stroke="5"
+              strokeLength="0.25"
+              bgOpacity="0.1"
+              speed="0.8"
+              color="blue"
+            />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-y-6">
+            {students?.items?.length == 0 ? (
+              <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
+                <LuInbox className="text-display-md text-gray-300" />
+                <p>Chưa có học viên nào</p>
+              </div>
+            ) : (
+              <table className="border-separate border-spacing-0 overflow-hidden border-1 border-surface-bg rounded-[16px] mt-6">
+                <thead>
+                  <tr className="flex items-center justify-between text-surface-nav font-medium">
+                    <td className="w-[50%] p-2">Học viên</td>
+                    <td className="w-[30%] p-2 text-right">Thao tác</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {students?.items?.map((value) => {
+                    return (
+                      <tr
+                        className="flex justify-between items-center border border-surface-bg hover:bg-surface-bg"
+                        key={value._id}
+                      >
+                        <td className="flex items-center gap-x-2 w-[60%] p-2">
+                          <img
+                            className="w-[50px] h-[50px] rounded-[1000px] object-contain shrink-0"
+                            src={value.avatar}
+                            referrerPolicy="no-referrer"
+                          />
+                          <div>
+                            <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
+                              {value.full_name}
+                            </p>
+                            <p className="text-nav-muted text-body-lg wrap-break-word">
+                              {value.email}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="flex justify-end gap-x-2 items-center w-[25%] pe-2">
+                          <IoEyeOutline
+                            onClick={() =>
+                              navigate(`/instructor/student/${value._id}`)
+                            }
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+            {students?.totalPages > 1 && (
+              <PaginationButton totalPages={students?.totalPages} />
+            )}
+          </div>
+        )}
       </div>
     </>
   );

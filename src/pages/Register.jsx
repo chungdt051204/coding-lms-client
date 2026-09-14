@@ -4,8 +4,9 @@ import { useSelector } from "react-redux";
 import { authService } from "../services/authService";
 import { validateForm } from "../../helper/validateForm";
 import { toast } from "react-toastify";
+import { Ring2 } from "ldrs/react";
+import "ldrs/react/Ring2.css";
 import { IoBookOutline } from "react-icons/io5";
-import loading from "../assets/loading.gif";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -163,7 +164,16 @@ const Register = () => {
                 Bạn muốn đăng ký với vai trò
               </label>
               {roles?.length == 0 ? (
-                <img width={100} className="mx-auto" src={loading} />
+                <div className="py-16 text-center">
+                  <Ring2
+                    size="40"
+                    stroke="5"
+                    strokeLength="0.25"
+                    bgOpacity="0.1"
+                    speed="0.8"
+                    color="blue"
+                  />
+                </div>
               ) : (
                 <div className="flex flex-col justify-between gap-2 lg:gap-0 min-h-[100px] lg:h-[100px]">
                   {rolesDisplay?.map((value) => {

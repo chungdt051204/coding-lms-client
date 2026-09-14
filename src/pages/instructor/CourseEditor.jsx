@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import { validateForm } from "../../../helper/validateForm";
 import ReactPlayer from "react-player";
 import axios from "axios";
+import { Ring2 } from "ldrs/react";
+import "ldrs/react/Ring2.css";
 import { FaPlus } from "react-icons/fa6";
 import { IoCloudUploadOutline } from "react-icons/io5";
 
@@ -16,6 +18,7 @@ const CourseEditor = () => {
   const isEdit = id ? true : false;
   const categories = useSelector((state) => state.categories.items);
   const levels = ["Cơ bản", "Trung bình", "Nâng cao"];
+  const [isLoading, setIsLoading] = useState(true);
   const [courseInfo, setCourseInfo] = useState({
     courseName: "",
     description: "",
@@ -120,42 +123,58 @@ const CourseEditor = () => {
   useEffect(() => {
     if (id) {
       const getCourseById = async () => {
-        const result = await courseService.getCourseById({ courseId: id });
-        console.log(result.data);
-        setCourseInfo({
-          courseName: result.data?.item?.course_name || "",
-          description: result.data?.item?.description || "",
-          category_id: result.data?.item?.category_id._id || "",
-          level: result.data?.item?.level || "",
-          image: result.data?.item?.image_url || null,
-          thumbnail: result.data?.item?.thumbnail_url || null,
-          price: result.data?.item?.price,
-        });
-        result.data?.item?.requirements?.forEach((value) => {
-          setRequirements((prev) => [...prev, value]);
-        });
-        result.data?.item?.objectives?.forEach((value) => {
-          setObjectives((prev) => [...prev, value]);
-        });
+        try {
+          const result = await courseService.getCourseById({ courseId: id });
+          console.log(result.data);
+          setCourseInfo({
+            courseName: result.data?.item?.course_name || "",
+            description: result.data?.item?.description || "",
+            category_id: result.data?.item?.category_id._id || "",
+            level: result.data?.item?.level || "",
+            image: result.data?.item?.image_url || null,
+            thumbnail: result.data?.item?.thumbnail_url || null,
+            price: result.data?.item?.price,
+          });
+          result.data?.item?.requirements?.forEach((value) => {
+            setRequirements((prev) => [...prev, value]);
+          });
+          result.data?.item?.objectives?.forEach((value) => {
+            setObjectives((prev) => [...prev, value]);
+          });
+        } catch (error) {
+          const status = error.status;
+          const message = error.message;
+          console.log(status, message);
+        } finally {
+          setIsLoading(false);
+        }
       };
       getCourseById();
       const getLessonsByCourse = async () => {
-        const result = await lessonService.getLessonsByCourse({ courseId: id });
-        if (result.data?.length > 0) {
-          const formattedLessons = result.data?.map((value) => {
-            return {
-              lessonId: value._id,
-              lessonName: value.lesson_name,
-              videoUrl: value.video_url,
-              duration: value.duration,
-              order: value.order,
-            };
+        try {
+          const result = await lessonService.getLessonsByCourse({
+            courseId: id,
           });
-          setLessons(formattedLessons);
+          if (result.data?.length > 0) {
+            const formattedLessons = result.data?.map((value) => {
+              return {
+                lessonId: value._id,
+                lessonName: value.lesson_name,
+                videoUrl: value.video_url,
+                duration: value.duration,
+                order: value.order,
+              };
+            });
+            setLessons(formattedLessons);
+          }
+        } catch (error) {
+          const status = error.status;
+          const message = error.message;
+          console.log(status, message);
         }
       };
       getLessonsByCourse();
-    }
+    } else setIsLoading(false);
   }, [id]);
 
   // Hàm set thông tin khóa học
@@ -313,600 +332,619 @@ const CourseEditor = () => {
 
   return (
     <>
-      <div className="w-[100%] px-6 md:px-8 py-8">
-        <div className="flex flex-col gap-y-1">
-          <p className="text-display-sm text-surface-nav font-bold">
-            {id ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}
-          </p>
-          <p className="text-title-lg text-nav-muted">
-            {id
-              ? "Chỉnh sửa thông tin khóa học của bạn"
-              : "Điền thông tin khóa học của bạn"}
-          </p>
+      {isLoading ? (
+        <div className="py-48 text-center">
+          <Ring2
+            size="40"
+            stroke="5"
+            strokeLength="0.25"
+            bgOpacity="0.1"
+            speed="0.8"
+            color="blue"
+          />
         </div>
-        <form className="mt-5" onSubmit={handleSave}>
-          {/* Thông tin cơ bản */}
-          <div className="flex flex-col gap-y-5 border-1 border-surface-bg rounded-[16px] p-5">
-            <p className="text-title-lg text-surface-nav font-medium">
-              Thông tin cơ bản
+      ) : (
+        <div className="w-[100%] px-6 md:px-8 py-8">
+          <div className="flex flex-col gap-y-1">
+            <p className="text-display-sm text-surface-nav font-bold">
+              {id ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}
             </p>
-            <div className="flex flex-col gap-y-2">
-              <label
-                className="text-surface-nav text-body-lg font-medium"
-                htmlFor="courseName"
-              >
-                Tên khóa học *
-              </label>
-              <input
-                className="p-2 bg-surface-bg rounded-[8px] truncate"
-                value={courseInfo.courseName}
-                onChange={(e) => {
-                  handleSetCourseInfo({
-                    e,
-                    setCourseInfo,
-                    field: "courseName",
-                  });
-                  handleSetError({ setError, field: "errorCourseName" });
-                }}
-                type="text"
-                placeholder="React cơ bản và nâng cao"
-              />
-              {error.errorCourseName && (
-                <span className="text-body-md text-red-500">
-                  {error.errorCourseName}
-                </span>
-              )}
-              <label
-                className="text-surface-nav text-body-lg font-medium"
-                htmlFor="description"
-              >
-                Mô tả *
-              </label>
-              <textarea
-                rows={5}
-                className="p-2 bg-surface-bg rounded-[8px]"
-                value={courseInfo.description}
-                onChange={(e) => {
-                  handleSetCourseInfo({
-                    e,
-                    setCourseInfo,
-                    field: "description",
-                  });
-                  setError((prev) => ({ ...prev, errorDescription: "" }));
-                }}
-                type="text"
-                placeholder="Mô tả chi tiết về khóa học..."
-              />
-              {error.errorDescription && (
-                <span className="text-body-md text-red-500">
-                  {error.errorDescription}
-                </span>
-              )}
-              <div className="flex flex-col gap-y-2 w-full md:flex-row md:justify-between md:w-[65%]">
-                <div className="flex flex-col gap-y-2">
-                  <label
-                    className="text-surface-nav text-body-lg font-medium"
-                    htmlFor="category"
-                  >
-                    Danh mục *
-                  </label>
-                  <div className="flex flex-col gap-y-2">
-                    <select
-                      className="p-2 bg-surface-white border-1 border-surface-bg rounded-[8px] text-nav-muted outline-none"
-                      value={courseInfo.category_id}
-                      onChange={(e) => {
-                        handleSetCourseInfo({
-                          e,
-                          setCourseInfo,
-                          field: "category_id",
-                        });
-                        handleSetError({ setError, field: "errorCategory" });
-                      }}
-                    >
-                      <option value="">Chọn danh mục</option>
-                      {categories?.map((value) => {
-                        return (
-                          <option
-                            key={value?.item?._id}
-                            value={value?.item?._id}
-                          >
-                            {value?.item?.category_name}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <span className="text-body-md text-red-500">
-                      {error.errorCategory}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-y-2">
-                  <label
-                    className="text-surface-nav text-body-lg font-medium"
-                    htmlFor="level"
-                  >
-                    Cấp độ *
-                  </label>
-                  <div className="flex flex-col gap-y-2">
-                    <select
-                      className="p-2 bg-surface-white border-1 border-surface-bg rounded-[8px] text-nav-muted outline-none"
-                      value={courseInfo.level}
-                      onChange={(e) => {
-                        handleSetCourseInfo({
-                          e,
-                          setCourseInfo,
-                          field: "level",
-                        });
-                        handleSetError({ setError, field: "errorLevel" });
-                      }}
-                    >
-                      <option value="">Chọn cấp độ</option>
-                      {levels?.map((value, index) => {
-                        return (
-                          <option key={index} value={value}>
-                            {value}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <span className="text-body-md text-red-500">
-                      {error.errorLevel}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <label
-                className="text-surface-nav text-body-lg font-medium"
-                htmlFor="image"
-              >
-                Ảnh khóa học *
-              </label>
-              <div className="flex flex-col gap-y-2 w-full md:w-[45%]">
-                {preview.imagePreview || courseInfo.image ? (
-                  <div className="relative">
-                    <img
-                      className="rounded-[16px] opacity-80 w-full md:w-[150px] h-[150px]"
-                      src={preview.imagePreview || courseInfo.image}
-                      alt=""
-                    />
-                  </div>
-                ) : (
-                  <div className="border-2 border-gray-300 border-dashed p-4 rounded-[8px]">
-                    <label htmlFor="imagePreview" className="text-body-md">
-                      <div className="flex gap-x-2 items-center text-brand-blue">
-                        <IoCloudUploadOutline />
-                        <p>Nhấp để chọn ảnh</p>
-                      </div>
-                      <p className="text-nav-muted">
-                        Định dạng: JPG, PNG, JPEG
-                      </p>
-                    </label>
-                    <input
-                      onChange={(e) => {
-                        if (
-                          handleValidateFile({ e, errorField: "errorImage" })
-                        ) {
-                          setCourseInfo((prev) => ({
-                            ...prev,
-                            image: e.target.files[0],
-                          }));
-                          handlePreview({
-                            e,
-                            field: "imagePreview",
-                            errorField: "errorImage",
-                          });
-                        }
-                      }}
-                      id="imagePreview"
-                      type="file"
-                      className="hidden"
-                    />
-                  </div>
-                )}
-                <span className="text-body-md text-red-500">
-                  {error.errorImage}
-                </span>
-              </div>
-              <label
-                className="text-surface-nav text-body-lg font-medium"
-                htmlFor="thumbnail"
-              >
-                Ảnh bìa *
-              </label>
-              <div className="flex flex-col gap-y-2 w-full md:w-[45%]">
-                {preview.thumbnailPreview || courseInfo.thumbnail ? (
-                  <div className="relative">
-                    <img
-                      className="rounded-[16px] opacity-80 w-full md:w-[200px] h-[200px]"
-                      src={preview.thumbnailPreview || courseInfo.thumbnail}
-                      alt=""
-                    />
-                  </div>
-                ) : (
-                  <div className="border-2 border-gray-300 border-dashed p-4 rounded-[8px]">
-                    <label htmlFor="thumbnailPreview" className="text-body-md">
-                      <div className="flex gap-x-2 items-center text-brand-blue">
-                        <IoCloudUploadOutline />
-                        <p>Nhấp để chọn ảnh</p>
-                      </div>
-                      <p className="text-nav-muted">
-                        Định dạng: JPG, PNG, JPEG
-                      </p>
-                    </label>
-                    <input
-                      onChange={(e) => {
-                        if (
-                          handleValidateFile({
-                            e,
-                            errorField: "errorThumbnail",
-                          })
-                        ) {
-                          setCourseInfo((prev) => ({
-                            ...prev,
-                            thumbnail: e.target.files[0],
-                          }));
-                          handlePreview({
-                            e,
-                            field: "thumbnailPreview",
-                            errorField: "errorThumbnail",
-                          });
-                        }
-                      }}
-                      id="thumbnailPreview"
-                      type="file"
-                      className="hidden"
-                    />
-                  </div>
-                )}
-                <span className="text-body-md text-red-500">
-                  {error.errorThumbnail}
-                </span>
-              </div>
-            </div>
+            <p className="text-title-lg text-nav-muted">
+              {id
+                ? "Chỉnh sửa thông tin khóa học của bạn"
+                : "Điền thông tin khóa học của bạn"}
+            </p>
           </div>
-          {/* Yêu cầu & kết quả đạt được */}
-          <div className="flex flex-col justify-between gap-y-3 mt-6 border border-surface-bg rounded-[16px] p-4">
-            <p className="text-title-lg text-surface-nav font-medium">
-              Yêu cầu & Kết quả đạt được
-            </p>
-            <div className="flex flex-col gap-y-2">
+          <form className="mt-5" onSubmit={handleSave}>
+            {/* Thông tin cơ bản */}
+            <div className="flex flex-col gap-y-5 border-1 border-surface-bg rounded-[16px] p-5">
+              <p className="text-title-lg text-surface-nav font-medium">
+                Thông tin cơ bản
+              </p>
               <div className="flex flex-col gap-y-2">
-                <p className="text-surface-nav text-body-lg font-medium">
-                  Yêu cầu trước khi học
-                </p>
-                <p className="text-nav-muted text-body-lg">
-                  Những kỹ năng cần có trước khi tham gia khóa học
-                </p>
-                <div className="flex flex-col gap-y-3 md:flex-row md:justify-between">
-                  <input
-                    className="p-2 w-full md:w-[80%] bg-surface-bg rounded-[8px] truncate"
-                    value={requirementContent}
-                    onChange={(e) => {
-                      setRequirementContent(e.target.value);
-                      setError((prev) => ({ ...prev, errorRequirement: "" }));
-                    }}
-                    type="text"
-                    placeholder="Ví dụ: Hiểu biết cơ bản về HTML, CSS"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleAddItem({
-                        content: requirementContent,
-                        setContent: setRequirementContent,
-                        setArray: setRequirements,
-                        field: "requirement",
-                      })
-                    }
-                    className="flex items-center gap-x-2 px-4 py-2 rounded-[8px] bg-surface-nav text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
-                  >
-                    <FaPlus />
-                    Thêm
-                  </button>
-                </div>
-                {error.errorRequirement && (
+                <label
+                  className="text-surface-nav text-body-lg font-medium"
+                  htmlFor="courseName"
+                >
+                  Tên khóa học *
+                </label>
+                <input
+                  className="p-2 bg-surface-bg rounded-[8px] truncate"
+                  value={courseInfo.courseName}
+                  onChange={(e) => {
+                    handleSetCourseInfo({
+                      e,
+                      setCourseInfo,
+                      field: "courseName",
+                    });
+                    handleSetError({ setError, field: "errorCourseName" });
+                  }}
+                  type="text"
+                  placeholder="React cơ bản và nâng cao"
+                />
+                {error.errorCourseName && (
                   <span className="text-body-md text-red-500">
-                    {error.errorRequirement}
+                    {error.errorCourseName}
                   </span>
                 )}
-                <ul>
-                  {requirements.length > 0 ? (
-                    requirements.map((value, index) => {
-                      return (
-                        <li className="flex justify-between mt-2" key={index}>
-                          <div className="w-[92%] p-2 bg-gray-100 rounded-[8px]">
-                            <p>{value}</p>
-                          </div>
-                          <button
-                            onClick={() =>
-                              handleDeleteItem({
-                                index,
-                                array: requirements,
-                                setArray: setRequirements,
-                              })
-                            }
-                            className="px-4 py-2 rounded-[8px] bg-surface-nav text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
-                            type="button"
-                          >
-                            Xóa
-                          </button>
-                        </li>
-                      );
-                    })
-                  ) : (
-                    <p className="italic text-body-lg text-nav-muted">
-                      Chưa có yêu cầu nào
-                    </p>
-                  )}
-                </ul>
-              </div>
-              <div className="flex flex-col gap-y-2">
-                <p className="text-surface-nav text-body-lg font-medium">
-                  Kết quả đạt được sau khóa học
-                </p>
-                <p className="text-nav-muted text-body-lg">
-                  Những kỹ năng hoặc kiến thức mà học viên sẽ có được sau khi
-                  hoàn thành khóa học
-                </p>
-                <div className="flex flex-col gap-y-3 md:flex-row md:justify-between">
-                  <input
-                    className="p-2 w-full md:w-[80%] bg-surface-bg rounded-[8px] truncate"
-                    value={objectiveContent}
-                    onChange={(e) => {
-                      setObjectiveContent(e.target.value);
-                      setError((prev) => ({ ...prev, errorObjective: "" }));
-                    }}
-                    type="text"
-                    placeholder="Ví dụ: Xây dựng được ứng dụng web hoàn chỉnh với React"
-                  />
-                  <button
-                    onClick={() =>
-                      handleAddItem({
-                        content: objectiveContent,
-                        setContent: setObjectiveContent,
-                        setArray: setObjectives,
-                        field: "objective",
-                      })
-                    }
-                    className="flex items-center gap-x-2 px-4 py-2 rounded-[8px] bg-surface-nav text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
-                    type="button"
-                  >
-                    <FaPlus />
-                    Thêm
-                  </button>
-                </div>
-                {error.errorObjective && (
+                <label
+                  className="text-surface-nav text-body-lg font-medium"
+                  htmlFor="description"
+                >
+                  Mô tả *
+                </label>
+                <textarea
+                  rows={5}
+                  className="p-2 bg-surface-bg rounded-[8px]"
+                  value={courseInfo.description}
+                  onChange={(e) => {
+                    handleSetCourseInfo({
+                      e,
+                      setCourseInfo,
+                      field: "description",
+                    });
+                    setError((prev) => ({ ...prev, errorDescription: "" }));
+                  }}
+                  type="text"
+                  placeholder="Mô tả chi tiết về khóa học..."
+                />
+                {error.errorDescription && (
                   <span className="text-body-md text-red-500">
-                    {error.errorObjective}
+                    {error.errorDescription}
                   </span>
                 )}
-                <ul>
-                  {objectives.length > 0 ? (
-                    objectives.map((value, index) => {
-                      return (
-                        <li className="flex justify-between mt-2" key={index}>
-                          <div className="w-[92%] p-2 bg-gray-100 rounded-[8px]">
-                            <p>{value}</p>
-                          </div>
-                          <button
-                            onClick={() =>
-                              handleDeleteItem({
-                                index,
-                                array: objectives,
-                                setArray: setObjectives,
-                              })
-                            }
-                            className="px-4 py-2 rounded-[8px] bg-surface-nav text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
-                            type="button"
-                          >
-                            Xóa
-                          </button>
-                        </li>
-                      );
-                    })
-                  ) : (
-                    <p className="italic text-body-lg text-nav-muted">
-                      Chưa có kết quả đạt được nào
-                    </p>
-                  )}
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-y-6 border border-surface-bg rounded-[16px] mt-6 p-4">
-            <p className="text-title-lg text-surface-nav font-medium">
-              Nội dung khóa học
-            </p>
-            <div className="flex flex-col gap-y-4">
-              {lessons?.map((value, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-col gap-y-4 border border-surface-bg rounded-[16px] py-4 ps-4 pe-8"
-                  >
-                    <div className="flex justify-between">
-                      <p className="text-title-lg text-surface-nav font-medium">
-                        Bài học {index + 1}
-                      </p>
-                      {(lessons?.length > 1 || lessons[0].lessonId) && (
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteLesson({ index })}
-                          className="text-body-lg text-surface-nav font-medium"
-                        >
-                          X
-                        </button>
-                      )}
-                    </div>
+                <div className="flex flex-col gap-y-2 w-full md:flex-row md:justify-between md:w-[65%]">
+                  <div className="flex flex-col gap-y-2">
+                    <label
+                      className="text-surface-nav text-body-lg font-medium"
+                      htmlFor="category"
+                    >
+                      Danh mục *
+                    </label>
                     <div className="flex flex-col gap-y-2">
-                      <label
-                        className="text-surface-nav text-body-lg font-medium"
-                        htmlFor="lessonName"
-                      >
-                        Tiêu đề bài học *
-                      </label>
-                      <input
-                        className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
-                        value={value.lessonName}
+                      <select
+                        className="p-2 bg-surface-white border-1 border-surface-bg rounded-[8px] text-nav-muted outline-none"
+                        value={courseInfo.category_id}
                         onChange={(e) => {
-                          handleSetLesson({
-                            fieldName: "lessonName",
-                            index,
+                          handleSetCourseInfo({
                             e,
-                            array: lessons,
-                            setArray: setLessons,
+                            setCourseInfo,
+                            field: "category_id",
                           });
-                          handleSetErrorLesson({
-                            fieldName: "errorLessonName",
-                            index,
-                            array: errorLessons,
-                            setArray: setErrorLessons,
-                          });
+                          handleSetError({ setError, field: "errorCategory" });
                         }}
-                        type="text"
-                        placeholder="Giới thiệu về React"
-                      />
-                      <span className="text-body-md text-red-500">
-                        {errorLessons[index]?.errorLessonName}
-                      </span>
-                      <label
-                        className="text-surface-nav text-body-lg font-medium"
-                        htmlFor="videoUrl"
                       >
-                        Link video
-                      </label>
-                      <input
-                        className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
-                        value={value.videoUrl}
-                        onChange={async (e) => {
-                          handleSetLesson({
-                            fieldName: "videoUrl",
-                            index,
-                            e,
-                            array: lessons,
-                            setArray: setLessons,
-                          });
-                          const videoUrl = lessons[index].videoUrl;
-                          if (!videoUrl.includes("https://www.youtube.com/")) {
-                            const newErrors = [...errorLessons];
-                            newErrors[index].errorVideoUrl =
-                              "Đường dẫn video không hợp lệ!";
-                            return;
-                          }
-                          const id = getYouTubeId(videoUrl);
-                          try {
-                            const result = await axios.get(
-                              `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${id}&key=${
-                                import.meta.env.VITE_API_KEY_YOUTUBE
-                              }`
-                            );
-                            const duration =
-                              result?.data?.items[0]?.contentDetails?.duration;
-                            const second = durationToSecond(duration);
-                            const newArray = [...lessons];
-                            newArray[index].duration = second;
-                            setLessons(newArray);
-                            handleSetErrorLesson({
-                              fieldName: "errorVideoUrl",
-                              index,
-                              array: errorLessons,
-                              setArray: setErrorLessons,
-                            });
-                            handleSetErrorLesson({
-                              fieldName: "errorDuration",
-                              index,
-                              array: errorLessons,
-                              setArray: setErrorLessons,
-                            });
-                          } catch (error) {
-                            const status = error.status;
-                            const message = error.message;
-                            console.log(status, message);
-                          }
-                        }}
-                        type="text"
-                        placeholder="https://www.youtube.com/watch?v=GQ-toR8F7rc"
-                      />
+                        <option value="">Chọn danh mục</option>
+                        {categories?.map((value) => {
+                          return (
+                            <option
+                              key={value?.item?._id}
+                              value={value?.item?._id}
+                            >
+                              {value?.item?.category_name}
+                            </option>
+                          );
+                        })}
+                      </select>
                       <span className="text-body-md text-red-500">
-                        {errorLessons[index]?.errorVideoUrl}
-                      </span>
-                      <div>
-                        {value.videoUrl &&
-                          value.videoUrl.includes(
-                            "https://www.youtube.com/"
-                          ) && <ReactPlayer src={value.videoUrl} />}
-                      </div>
-                      <label
-                        className="text-surface-nav text-body-lg font-medium"
-                        htmlFor="duration"
-                      >
-                        Thời lượng
-                      </label>
-                      <input
-                        className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
-                        value={value.duration}
-                        type="text"
-                        disabled
-                        placeholder="Thời lượng hiển thị tự động sau khi điền link video hợp lệ"
-                      />
-                      <span className="text-body-md text-red-500">
-                        {errorLessons[index]?.errorDuration}
+                        {error.errorCategory}
                       </span>
                     </div>
                   </div>
-                );
-              })}
+                  <div className="flex flex-col gap-y-2">
+                    <label
+                      className="text-surface-nav text-body-lg font-medium"
+                      htmlFor="level"
+                    >
+                      Cấp độ *
+                    </label>
+                    <div className="flex flex-col gap-y-2">
+                      <select
+                        className="p-2 bg-surface-white border-1 border-surface-bg rounded-[8px] text-nav-muted outline-none"
+                        value={courseInfo.level}
+                        onChange={(e) => {
+                          handleSetCourseInfo({
+                            e,
+                            setCourseInfo,
+                            field: "level",
+                          });
+                          handleSetError({ setError, field: "errorLevel" });
+                        }}
+                      >
+                        <option value="">Chọn cấp độ</option>
+                        {levels?.map((value, index) => {
+                          return (
+                            <option key={index} value={value}>
+                              {value}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <span className="text-body-md text-red-500">
+                        {error.errorLevel}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <label
+                  className="text-surface-nav text-body-lg font-medium"
+                  htmlFor="image"
+                >
+                  Ảnh khóa học *
+                </label>
+                <div className="flex flex-col gap-y-2 w-full md:w-[45%]">
+                  {preview.imagePreview || courseInfo.image ? (
+                    <div className="relative">
+                      <img
+                        className="rounded-[16px] opacity-80 w-full md:w-[150px] h-[150px]"
+                        src={preview.imagePreview || courseInfo.image}
+                        alt=""
+                      />
+                    </div>
+                  ) : (
+                    <div className="border-2 border-gray-300 border-dashed p-4 rounded-[8px]">
+                      <label htmlFor="imagePreview" className="text-body-md">
+                        <div className="flex gap-x-2 items-center text-brand-blue">
+                          <IoCloudUploadOutline />
+                          <p>Nhấp để chọn ảnh</p>
+                        </div>
+                        <p className="text-nav-muted">
+                          Định dạng: JPG, PNG, JPEG
+                        </p>
+                      </label>
+                      <input
+                        onChange={(e) => {
+                          if (
+                            handleValidateFile({ e, errorField: "errorImage" })
+                          ) {
+                            setCourseInfo((prev) => ({
+                              ...prev,
+                              image: e.target.files[0],
+                            }));
+                            handlePreview({
+                              e,
+                              field: "imagePreview",
+                              errorField: "errorImage",
+                            });
+                          }
+                        }}
+                        id="imagePreview"
+                        type="file"
+                        className="hidden"
+                      />
+                    </div>
+                  )}
+                  <span className="text-body-md text-red-500">
+                    {error.errorImage}
+                  </span>
+                </div>
+                <label
+                  className="text-surface-nav text-body-lg font-medium"
+                  htmlFor="thumbnail"
+                >
+                  Ảnh bìa *
+                </label>
+                <div className="flex flex-col gap-y-2 w-full md:w-[45%]">
+                  {preview.thumbnailPreview || courseInfo.thumbnail ? (
+                    <div className="relative">
+                      <img
+                        className="rounded-[16px] opacity-80 w-full md:w-[200px] h-[200px]"
+                        src={preview.thumbnailPreview || courseInfo.thumbnail}
+                        alt=""
+                      />
+                    </div>
+                  ) : (
+                    <div className="border-2 border-gray-300 border-dashed p-4 rounded-[8px]">
+                      <label
+                        htmlFor="thumbnailPreview"
+                        className="text-body-md"
+                      >
+                        <div className="flex gap-x-2 items-center text-brand-blue">
+                          <IoCloudUploadOutline />
+                          <p>Nhấp để chọn ảnh</p>
+                        </div>
+                        <p className="text-nav-muted">
+                          Định dạng: JPG, PNG, JPEG
+                        </p>
+                      </label>
+                      <input
+                        onChange={(e) => {
+                          if (
+                            handleValidateFile({
+                              e,
+                              errorField: "errorThumbnail",
+                            })
+                          ) {
+                            setCourseInfo((prev) => ({
+                              ...prev,
+                              thumbnail: e.target.files[0],
+                            }));
+                            handlePreview({
+                              e,
+                              field: "thumbnailPreview",
+                              errorField: "errorThumbnail",
+                            });
+                          }
+                        }}
+                        id="thumbnailPreview"
+                        type="file"
+                        className="hidden"
+                      />
+                    </div>
+                  )}
+                  <span className="text-body-md text-red-500">
+                    {error.errorThumbnail}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setLessons((prev) => [
-                    ...prev,
-                    { lessonName: "", videoUrl: "", duration: "", order: 0 },
-                  ]);
-                }}
-                className="w-full md:w-[25%] flex justify-center items-center gap-x-4 p-2  bg-surface-nav rounded-[8px] text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
-              >
-                <FaPlus />
-                Thêm bài học
-              </button>
+            {/* Yêu cầu & kết quả đạt được */}
+            <div className="flex flex-col justify-between gap-y-3 mt-6 border border-surface-bg rounded-[16px] p-4">
+              <p className="text-title-lg text-surface-nav font-medium">
+                Yêu cầu & Kết quả đạt được
+              </p>
+              <div className="flex flex-col gap-y-2">
+                <div className="flex flex-col gap-y-2">
+                  <p className="text-surface-nav text-body-lg font-medium">
+                    Yêu cầu trước khi học
+                  </p>
+                  <p className="text-nav-muted text-body-lg">
+                    Những kỹ năng cần có trước khi tham gia khóa học
+                  </p>
+                  <div className="flex flex-col gap-y-3 md:flex-row md:justify-between">
+                    <input
+                      className="p-2 w-full md:w-[80%] bg-surface-bg rounded-[8px] truncate"
+                      value={requirementContent}
+                      onChange={(e) => {
+                        setRequirementContent(e.target.value);
+                        setError((prev) => ({ ...prev, errorRequirement: "" }));
+                      }}
+                      type="text"
+                      placeholder="Ví dụ: Hiểu biết cơ bản về HTML, CSS"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleAddItem({
+                          content: requirementContent,
+                          setContent: setRequirementContent,
+                          setArray: setRequirements,
+                          field: "requirement",
+                        })
+                      }
+                      className="flex items-center gap-x-2 px-4 py-2 rounded-[8px] bg-surface-nav text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                    >
+                      <FaPlus />
+                      Thêm
+                    </button>
+                  </div>
+                  {error.errorRequirement && (
+                    <span className="text-body-md text-red-500">
+                      {error.errorRequirement}
+                    </span>
+                  )}
+                  <ul>
+                    {requirements.length > 0 ? (
+                      requirements.map((value, index) => {
+                        return (
+                          <li className="flex justify-between mt-2" key={index}>
+                            <div className="w-[92%] p-2 bg-gray-100 rounded-[8px]">
+                              <p>{value}</p>
+                            </div>
+                            <button
+                              onClick={() =>
+                                handleDeleteItem({
+                                  index,
+                                  array: requirements,
+                                  setArray: setRequirements,
+                                })
+                              }
+                              className="px-4 py-2 rounded-[8px] bg-surface-nav text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                              type="button"
+                            >
+                              Xóa
+                            </button>
+                          </li>
+                        );
+                      })
+                    ) : (
+                      <p className="italic text-body-lg text-nav-muted">
+                        Chưa có yêu cầu nào
+                      </p>
+                    )}
+                  </ul>
+                </div>
+                <div className="flex flex-col gap-y-2">
+                  <p className="text-surface-nav text-body-lg font-medium">
+                    Kết quả đạt được sau khóa học
+                  </p>
+                  <p className="text-nav-muted text-body-lg">
+                    Những kỹ năng hoặc kiến thức mà học viên sẽ có được sau khi
+                    hoàn thành khóa học
+                  </p>
+                  <div className="flex flex-col gap-y-3 md:flex-row md:justify-between">
+                    <input
+                      className="p-2 w-full md:w-[80%] bg-surface-bg rounded-[8px] truncate"
+                      value={objectiveContent}
+                      onChange={(e) => {
+                        setObjectiveContent(e.target.value);
+                        setError((prev) => ({ ...prev, errorObjective: "" }));
+                      }}
+                      type="text"
+                      placeholder="Ví dụ: Xây dựng được ứng dụng web hoàn chỉnh với React"
+                    />
+                    <button
+                      onClick={() =>
+                        handleAddItem({
+                          content: objectiveContent,
+                          setContent: setObjectiveContent,
+                          setArray: setObjectives,
+                          field: "objective",
+                        })
+                      }
+                      className="flex items-center gap-x-2 px-4 py-2 rounded-[8px] bg-surface-nav text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                      type="button"
+                    >
+                      <FaPlus />
+                      Thêm
+                    </button>
+                  </div>
+                  {error.errorObjective && (
+                    <span className="text-body-md text-red-500">
+                      {error.errorObjective}
+                    </span>
+                  )}
+                  <ul>
+                    {objectives.length > 0 ? (
+                      objectives.map((value, index) => {
+                        return (
+                          <li className="flex justify-between mt-2" key={index}>
+                            <div className="w-[92%] p-2 bg-gray-100 rounded-[8px]">
+                              <p>{value}</p>
+                            </div>
+                            <button
+                              onClick={() =>
+                                handleDeleteItem({
+                                  index,
+                                  array: objectives,
+                                  setArray: setObjectives,
+                                })
+                              }
+                              className="px-4 py-2 rounded-[8px] bg-surface-nav text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                              type="button"
+                            >
+                              Xóa
+                            </button>
+                          </li>
+                        );
+                      })
+                    ) : (
+                      <p className="italic text-body-lg text-nav-muted">
+                        Chưa có kết quả đạt được nào
+                      </p>
+                    )}
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-          {/* Cài đặt */}
-          <div className="border border-surface-bg rounded-[16px] p-4 mt-6">
-            <p className="text-title-lg text-surface-nav font-medium">
-              Cài đặt
-            </p>
-            <div className="flex flex-col justify-between gap-y-2 mt-4">
-              <label
-                className="text-surface-nav text-body-lg font-medium"
-                htmlFor="price"
-              >
-                Giá(VNĐ) *
-              </label>
-              <input
-                type="text"
-                className="p-2 bg-surface-bg rounded-[8px] w-full"
-                value={courseInfo.price}
-                onChange={(e) => {
-                  handleSetCourseInfo({ e, setCourseInfo, field: "price" });
-                  handleSetError({ setError, field: "errorPrice" });
-                }}
-                placeholder="199000"
-              />
-              <span className="text-body-md text-red-500">
-                {error.errorPrice}
-              </span>
-              <input
-                className="bg-surface-nav text-surface-white  text-title-lg p-2 rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
-                type="submit"
-                value="Lưu"
-              />
+            <div className="flex flex-col gap-y-6 border border-surface-bg rounded-[16px] mt-6 p-4">
+              <p className="text-title-lg text-surface-nav font-medium">
+                Nội dung khóa học
+              </p>
+              <div className="flex flex-col gap-y-4">
+                {lessons?.map((value, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col gap-y-4 border border-surface-bg rounded-[16px] py-4 ps-4 pe-8"
+                    >
+                      <div className="flex justify-between">
+                        <p className="text-title-lg text-surface-nav font-medium">
+                          Bài học {index + 1}
+                        </p>
+                        {(lessons?.length > 1 || lessons[0].lessonId) && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteLesson({ index })}
+                            className="text-body-lg text-surface-nav font-medium"
+                          >
+                            X
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-y-2">
+                        <label
+                          className="text-surface-nav text-body-lg font-medium"
+                          htmlFor="lessonName"
+                        >
+                          Tiêu đề bài học *
+                        </label>
+                        <input
+                          className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
+                          value={value.lessonName}
+                          onChange={(e) => {
+                            handleSetLesson({
+                              fieldName: "lessonName",
+                              index,
+                              e,
+                              array: lessons,
+                              setArray: setLessons,
+                            });
+                            handleSetErrorLesson({
+                              fieldName: "errorLessonName",
+                              index,
+                              array: errorLessons,
+                              setArray: setErrorLessons,
+                            });
+                          }}
+                          type="text"
+                          placeholder="Giới thiệu về React"
+                        />
+                        <span className="text-body-md text-red-500">
+                          {errorLessons[index]?.errorLessonName}
+                        </span>
+                        <label
+                          className="text-surface-nav text-body-lg font-medium"
+                          htmlFor="videoUrl"
+                        >
+                          Link video
+                        </label>
+                        <input
+                          className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
+                          value={value.videoUrl}
+                          onChange={async (e) => {
+                            handleSetLesson({
+                              fieldName: "videoUrl",
+                              index,
+                              e,
+                              array: lessons,
+                              setArray: setLessons,
+                            });
+                            const videoUrl = lessons[index].videoUrl;
+                            if (
+                              !videoUrl.includes("https://www.youtube.com/")
+                            ) {
+                              const newErrors = [...errorLessons];
+                              newErrors[index].errorVideoUrl =
+                                "Đường dẫn video không hợp lệ!";
+                              return;
+                            }
+                            const id = getYouTubeId(videoUrl);
+                            try {
+                              const result = await axios.get(
+                                `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${id}&key=${
+                                  import.meta.env.VITE_API_KEY_YOUTUBE
+                                }`
+                              );
+                              const duration =
+                                result?.data?.items[0]?.contentDetails
+                                  ?.duration;
+                              const second = durationToSecond(duration);
+                              const newArray = [...lessons];
+                              newArray[index].duration = second;
+                              setLessons(newArray);
+                              handleSetErrorLesson({
+                                fieldName: "errorVideoUrl",
+                                index,
+                                array: errorLessons,
+                                setArray: setErrorLessons,
+                              });
+                              handleSetErrorLesson({
+                                fieldName: "errorDuration",
+                                index,
+                                array: errorLessons,
+                                setArray: setErrorLessons,
+                              });
+                            } catch (error) {
+                              const status = error.status;
+                              const message = error.message;
+                              console.log(status, message);
+                            }
+                          }}
+                          type="text"
+                          placeholder="https://www.youtube.com/watch?v=GQ-toR8F7rc"
+                        />
+                        <span className="text-body-md text-red-500">
+                          {errorLessons[index]?.errorVideoUrl}
+                        </span>
+                        <div>
+                          {value.videoUrl &&
+                            value.videoUrl.includes(
+                              "https://www.youtube.com/"
+                            ) && <ReactPlayer src={value.videoUrl} />}
+                        </div>
+                        <label
+                          className="text-surface-nav text-body-lg font-medium"
+                          htmlFor="duration"
+                        >
+                          Thời lượng
+                        </label>
+                        <input
+                          className="p-2 bg-surface-bg rounded-[8px] w-full truncate"
+                          value={value.duration}
+                          type="text"
+                          disabled
+                          placeholder="Thời lượng hiển thị tự động sau khi điền link video hợp lệ"
+                        />
+                        <span className="text-body-md text-red-500">
+                          {errorLessons[index]?.errorDuration}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLessons((prev) => [
+                      ...prev,
+                      { lessonName: "", videoUrl: "", duration: "", order: 0 },
+                    ]);
+                  }}
+                  className="w-full md:w-[25%] flex justify-center items-center gap-x-4 p-2  bg-surface-nav rounded-[8px] text-body-lg text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                >
+                  <FaPlus />
+                  Thêm bài học
+                </button>
+              </div>
             </div>
-          </div>
-        </form>
-      </div>
+            {/* Cài đặt */}
+            <div className="border border-surface-bg rounded-[16px] p-4 mt-6">
+              <p className="text-title-lg text-surface-nav font-medium">
+                Cài đặt
+              </p>
+              <div className="flex flex-col justify-between gap-y-2 mt-4">
+                <label
+                  className="text-surface-nav text-body-lg font-medium"
+                  htmlFor="price"
+                >
+                  Giá(VNĐ) *
+                </label>
+                <input
+                  type="text"
+                  className="p-2 bg-surface-bg rounded-[8px] w-full"
+                  value={courseInfo.price}
+                  onChange={(e) => {
+                    handleSetCourseInfo({ e, setCourseInfo, field: "price" });
+                    handleSetError({ setError, field: "errorPrice" });
+                  }}
+                  placeholder="199000"
+                />
+                <span className="text-body-md text-red-500">
+                  {error.errorPrice}
+                </span>
+                <input
+                  className="bg-surface-nav text-surface-white  text-title-lg p-2 rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                  type="submit"
+                  value="Lưu"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
     </>
   );
 };

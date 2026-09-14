@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { courseService } from "../services/courseService";
 import { setCourses } from "../stores/features/courseSlice";
+import { Ring2 } from "ldrs/react";
+import "ldrs/react/Ring2.css";
 import { FaArrowRight } from "react-icons/fa6";
 import { IoBookOutline } from "react-icons/io5";
 import { RxPeople } from "react-icons/rx";
@@ -13,7 +15,6 @@ import ListCourses from "../components/ListCourses";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ChatBotAI from "../components/ChatBotAI";
-import loading from "../assets/loading.gif";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -171,7 +172,16 @@ const LandingPage = () => {
             </p>
           </div>
           {categories?.length == 0 ? (
-            <img width={100} className="mx-auto" src={loading} />
+            <div className="py-16 text-center">
+              <Ring2
+                size="40"
+                stroke="5"
+                strokeLength="0.25"
+                bgOpacity="0.1"
+                speed="0.8"
+                color="blue"
+              />
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:flex xl:justify-between gap-4 md:gap-6 xl:gap-0">
               {categories?.map((value, index) => {

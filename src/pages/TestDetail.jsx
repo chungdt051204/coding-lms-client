@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { testService } from "../services/testService";
 import { questionService } from "../services/questionService";
 import { testResultService } from "../services/testResultService";
 import { toast } from "react-toastify";
+import { Ring2 } from "ldrs/react";
+import "ldrs/react/Ring2.css";
 import { Progress } from "antd";
 import { GoClock } from "react-icons/go";
 import { FiFlag } from "react-icons/fi";
@@ -13,14 +15,23 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa6";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { enrollmentService } from "../services/enrollmentService";
+import { setEnrollments } from "../stores/features/enrollmentSlice";
 
 const TestDetail = () => {
   const navigate = useNavigate();
-  const { item: me, isLoading } = useSelector((state) => state.me);
-  const isAdmin = me?.role_id?.role === "admin";
-  const isInstructor = me?.role_id?.role === "instructor";
   const { courseId } = useParams();
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const { item: me, isLoading } = useSelector((state) => state.me);
+  const { items: enrollments, loading } = useSelector(
+    (state) => state.enrollments
+  );
+  const isAdmin = me?.role_id?.role === "admin";
+  const isInstructor = me?.role_id?.role === "instructor";
+  const accessedTest = enrollments?.arrayEnrollment?.some(
+    (value) => value?.item?.course_id?._id == courseId
+  );
   const [test, setTest] = useState(null);
   const [timer, setTimer] = useState({ minutes: 0, seconds: 0 });
   const [questions, setQuestions] = useState([]);
@@ -36,11 +47,42 @@ const TestDetail = () => {
   const [startedAt, setStartedAt] = useState("");
 
   useEffect(() => {
+    console.log(accessedTest);
+  }, [accessedTest, enrollments]);
+
+  useEffect(() => {
     if (!sessionStorage.getItem("token")) {
       navigate("/");
       return;
     }
-  }, [navigate]);
+    if (
+      !isLoading &&
+      me?.role_id?.role === "user" &&
+      !loading &&
+      !accessedTest
+    ) {
+      navigate("/");
+      return;
+    }
+  }, [navigate, isLoading, accessedTest, me, loading]);
+
+  useEffect(() => {
+    if (me?.role_id?.role === "user") {
+      const getEnrollmentsByUser = async () => {
+        try {
+          const result = await enrollmentService.getEnrollmentsByUser({
+            params: {},
+          });
+          dispatch(setEnrollments(result.data));
+        } catch (error) {
+          const status = error.status;
+          const message = error.data.message;
+          console.log(status, message);
+        }
+      };
+      getEnrollmentsByUser();
+    }
+  }, [dispatch, me]);
 
   useEffect(() => {
     if (id) {
@@ -149,143 +191,157 @@ const TestDetail = () => {
       }
     }
   }, [clicked, submitted, timer.minutes, timer.seconds]);
-  if (isLoading) return <div className="text-center">Đang tải dữ liệu...</div>;
   return (
     <>
       <Navbar />
-      <div className="bg-gray-100 py-18 h-[100vh] lg:h-auto">
-        <div className="flex flex-col gap-y-2 py-5 px-8 md:px-16 lg:px-24 bg-surface-white">
-          <div className="flex flex-col gap-y-4 md:flex-row md:justify-between">
-            <p className="text-headline-md text-surface-nav font-bold">
-              {test?.test_name || ""}
-            </p>
-            <div className="flex gap-x-4">
-              <div className="flex gap-x-2 items-center py-2 px-4 rounded-[8px] bg-blue-100 text-headline-sm text-blue-700 font-bold">
-                <GoClock />
-                <p>
-                  {String(timer.minutes).padStart(2, "0")}:
-                  {String(timer.seconds).padStart(2, "0")}
-                </p>
-              </div>
-              <button
-                onClick={clicked ? handleSubmit : handleStart}
-                className={`flex gap-x-2 items-center py-1 px-4 border rounded-[8px] text-title-sm font-medium transition-transform duration-300 hover:cursor-pointer ${
-                  !clicked
-                    ? "bg-surface-nav text-surface-white hover:text-surface-bg"
-                    : "bg-surface-white border-gray-300 hover:bg-gray-100"
-                }`}
-              >
-                {clicked && <FiFlag />}
-                {clicked ? "Nộp bài" : "Bắt đầu làm bài"}
-              </button>
-            </div>
-          </div>
-          <p className="text-title-sm text-nav-muted">
-            Đã trả lời {answeredQuestions}/{questions?.length}
-          </p>
-          <Progress style={{ fontSize: 16 }} percent={currentProgress} />
+      {!test || questions?.length == 0 ? (
+        <div className="my-[50vh] h-[100vh] text-center">
+          <Ring2
+            size="40"
+            stroke="5"
+            strokeLength="0.25"
+            bgOpacity="0.1"
+            speed="0.8"
+            color="blue"
+          />
         </div>
-        <div className="py-6 px-8 md:px-16 lg:px-24">
-          <div className="border border-gray-300 rounded-[16px] p-8 bg-surface-white">
-            <div className="flex justify-between">
-              <p className="text-body-md font-medium text-purple-700 px-3 py-1 bg-purple-100 rounded-[8px]">
-                Câu {currentIndex + 1}/{questions?.length}
+      ) : (
+        <div className="bg-gray-100 py-18 h-[100vh] lg:h-auto">
+          <div className="flex flex-col gap-y-2 py-5 px-8 md:px-16 lg:px-24 bg-surface-white">
+            <div className="flex flex-col gap-y-4 md:flex-row md:justify-between">
+              <p className="text-headline-md text-surface-nav font-bold">
+                {test?.test_name || ""}
               </p>
-              {currentQuestion?.options?.some(
-                (item) =>
-                  item?._id == selectedOptionIds[currentQuestion?.question?._id]
-              ) && (
-                <div className="flex gap-x-1 items-center text-body-md font-medium text-green-700 px-3 py-1 bg-green-100 rounded-[8px]">
-                  <CiCircleCheck />
-                  <p>Đã trả lời</p>
+              <div className="flex gap-x-4">
+                <div className="flex gap-x-2 items-center py-2 px-4 rounded-[8px] bg-blue-100 text-headline-sm text-blue-700 font-bold">
+                  <GoClock />
+                  <p>
+                    {String(timer.minutes).padStart(2, "0")}:
+                    {String(timer.seconds).padStart(2, "0")}
+                  </p>
                 </div>
-              )}
+                <button
+                  onClick={clicked ? handleSubmit : handleStart}
+                  className={`flex gap-x-2 items-center py-1 px-4 border rounded-[8px] text-title-sm font-medium transition-transform duration-300 hover:cursor-pointer ${
+                    !clicked
+                      ? "bg-surface-nav text-surface-white hover:text-surface-bg"
+                      : "bg-surface-white border-gray-300 hover:bg-gray-100"
+                  }`}
+                >
+                  {clicked && <FiFlag />}
+                  {clicked ? "Nộp bài" : "Bắt đầu làm bài"}
+                </button>
+              </div>
             </div>
-            <div className="flex flex-col gap-y-6 mt-4">
-              <p className="text-headline-sm text-surface-nav font-bold">
-                {currentQuestion?.question?.question_content || ""}
-              </p>
-              <div className="flex flex-col gap-y-2">
-                {currentQuestion?.options?.map((value) => {
-                  return (
-                    <div key={value._id}>
-                      <div
-                        className={`flex gap-x-2 border-2 rounded-[8px] p-4 transition-transform duration-300 hover:border-blue-200 ${
-                          selectedOptionIds[currentQuestion?.question?._id] ==
-                          value._id
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200"
-                        }`}
-                      >
-                        <input
-                          checked={
+            <p className="text-title-sm text-nav-muted">
+              Đã trả lời {answeredQuestions}/{questions?.length}
+            </p>
+            <Progress style={{ fontSize: 16 }} percent={currentProgress} />
+          </div>
+          <div className="py-6 px-8 md:px-16 lg:px-24">
+            <div className="border border-gray-300 rounded-[16px] p-8 bg-surface-white">
+              <div className="flex justify-between">
+                <p className="text-body-md font-medium text-purple-700 px-3 py-1 bg-purple-100 rounded-[8px]">
+                  Câu {currentIndex + 1}/{questions?.length}
+                </p>
+                {currentQuestion?.options?.some(
+                  (item) =>
+                    item?._id ==
+                    selectedOptionIds[currentQuestion?.question?._id]
+                ) && (
+                  <div className="flex gap-x-1 items-center text-body-md font-medium text-green-700 px-3 py-1 bg-green-100 rounded-[8px]">
+                    <CiCircleCheck />
+                    <p>Đã trả lời</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col gap-y-6 mt-4">
+                <p className="text-headline-sm text-surface-nav font-bold">
+                  {currentQuestion?.question?.question_content || ""}
+                </p>
+                <div className="flex flex-col gap-y-2">
+                  {currentQuestion?.options?.map((value) => {
+                    return (
+                      <div key={value._id}>
+                        <div
+                          className={`flex gap-x-2 border-2 rounded-[8px] p-4 transition-transform duration-300 hover:border-blue-200 ${
                             selectedOptionIds[currentQuestion?.question?._id] ==
                             value._id
-                          }
-                          onChange={() => {
-                            if (!clicked) {
-                              toast.warning(
-                                "Vui lòng nhấn bắt đầu làm bài kiểm tra!"
-                              );
-                              return;
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200"
+                          }`}
+                        >
+                          <input
+                            checked={
+                              selectedOptionIds[
+                                currentQuestion?.question?._id
+                              ] == value._id
                             }
-                            setSelectedOptionIds((prev) => ({
-                              ...prev,
-                              [currentQuestion?.question?._id]: value._id,
-                            }));
-                          }}
-                          type="radio"
-                        />
-                        <p className="text-surface-nav text-title-sm font-medium">
-                          {value.answer_content}
-                        </p>
+                            onChange={() => {
+                              if (!clicked) {
+                                toast.warning(
+                                  "Vui lòng nhấn bắt đầu làm bài kiểm tra!"
+                                );
+                                return;
+                              }
+                              setSelectedOptionIds((prev) => ({
+                                ...prev,
+                                [currentQuestion?.question?._id]: value._id,
+                              }));
+                            }}
+                            type="radio"
+                          />
+                          <p className="text-surface-nav text-title-sm font-medium">
+                            {value.answer_content}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col gap-y-2 md:flex-row md:justify-between mt-6">
-              <button
-                onClick={() => {
-                  if (!clicked) {
-                    toast.warning("Vui lòng ấn bắt đầu làm bài kiểm tra!");
-                    return;
-                  }
-                  setCurrentIndex(currentIndex - 1);
-                }}
-                disabled={currentIndex == 0}
-                className={`flex justify-center gap-x-2 items-center px-4 py-2 md:py-1 border border-gray-200 rounded-[8px] text-title-sm font-medium ${
-                  currentIndex == 0
-                    ? "text-nav-muted hover:cursor-not-allowed"
-                    : "text-surface-nav transition-transform duration-300 hover:cursor-pointer hover:bg-surface-bg"
-                }`}
-              >
-                <FaArrowLeft />
-                <p> Câu trước</p>
-              </button>
-              <button
-                onClick={() => {
-                  if (!clicked) {
-                    toast.warning("Vui lòng ấn bắt đầu làm bài kiểm tra!");
-                    return;
-                  }
-                  setCurrentIndex(currentIndex + 1);
-                }}
-                disabled={currentIndex == questions?.length - 1}
-                className={`flex justify-center gap-x-2 items-center px-4 py-2 md:py-1 rounded-[8px] text-title-sm text-surface-white font-medium ${
-                  currentIndex == questions?.length - 1
-                    ? "bg-gray-400 hover:cursor-not-allowed"
-                    : "bg-surface-nav transition-transform duration-300 hover:cursor-pointer hover:text-surface-bg"
-                }`}
-              >
-                <p>Câu sau</p>
-                <FaArrowRight />
-              </button>
+              <div className="flex flex-col gap-y-2 md:flex-row md:justify-between mt-6">
+                <button
+                  onClick={() => {
+                    if (!clicked) {
+                      toast.warning("Vui lòng ấn bắt đầu làm bài kiểm tra!");
+                      return;
+                    }
+                    setCurrentIndex(currentIndex - 1);
+                  }}
+                  disabled={currentIndex == 0}
+                  className={`flex justify-center gap-x-2 items-center px-4 py-2 md:py-1 border border-gray-200 rounded-[8px] text-title-sm font-medium ${
+                    currentIndex == 0
+                      ? "text-nav-muted hover:cursor-not-allowed"
+                      : "text-surface-nav transition-transform duration-300 hover:cursor-pointer hover:bg-surface-bg"
+                  }`}
+                >
+                  <FaArrowLeft />
+                  <p> Câu trước</p>
+                </button>
+                <button
+                  onClick={() => {
+                    if (!clicked) {
+                      toast.warning("Vui lòng ấn bắt đầu làm bài kiểm tra!");
+                      return;
+                    }
+                    setCurrentIndex(currentIndex + 1);
+                  }}
+                  disabled={currentIndex == questions?.length - 1}
+                  className={`flex justify-center gap-x-2 items-center px-4 py-2 md:py-1 rounded-[8px] text-title-sm text-surface-white font-medium ${
+                    currentIndex == questions?.length - 1
+                      ? "bg-gray-400 hover:cursor-not-allowed"
+                      : "bg-surface-nav transition-transform duration-300 hover:cursor-pointer hover:text-surface-bg"
+                  }`}
+                >
+                  <p>Câu sau</p>
+                  <FaArrowRight />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       {me?.role_id?.role == "user" && <Footer />}
     </>
   );

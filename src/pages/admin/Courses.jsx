@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { courseService } from "../../services/courseService";
 import { toast } from "react-toastify";
 import { socket } from "../../../socket";
+import { Ring2 } from "ldrs/react";
+import "ldrs/react/Ring2.css";
 import { RxPeople } from "react-icons/rx";
 import { IoListOutline } from "react-icons/io5";
 import { GoClock } from "react-icons/go";
@@ -119,7 +121,7 @@ const AdminCourses = () => {
   return (
     <>
       <div className="w-[100%] px-6 md:px-8 py-8">
-        <div className="h-[70px] flex flex-col justify-between">
+        <div className="flex flex-col gap-y-1">
           <p className="text-display-sm text-surface-nav font-bold">
             Quản lý khóa học
           </p>
@@ -164,43 +166,158 @@ const AdminCourses = () => {
             );
           })}
         </div>
-        <div className="flex flex-col gap-y-6">
-          {isLoading ? (
-            <p className="text-title-lg text-surface-nav text-center mt-2">
-              Đang tải dữ liệu...
-            </p>
-          ) : courses?.arrayCourse?.length == 0 ? (
-            <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
-              <LuInbox className="text-display-md text-gray-300" />
-              <p>Chưa có khóa học nào</p>
-            </div>
-          ) : (
-            <>
-              <div className="hidden xl:block w-full">
-                <table className="w-full border-separate border-spacing-0 overflow-hidden border border-surface-bg rounded-[16px] mt-6">
-                  <thead>
-                    <tr className="flex items-center justify-between text-surface-nav font-medium">
-                      <td className="w-[35%] p-2">Khóa học</td>
-                      <td className="w-[20%]">Giảng viên</td>
-                      <td className="w-[16%]">Học viên</td>
-                      <td className="w-[9%]">Trạng thái</td>
-                      <td className="w-[20%] p-2 text-right">Thao tác</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {courses?.arrayCourse?.length > 0 ? (
-                      courses?.arrayCourse?.map((value) => {
-                        return (
-                          <tr
-                            className="flex justify-between items-center border-t border-surface-bg hover:bg-surface-bg"
-                            key={value?.course._id}
+        {isLoading ? (
+          <div className="py-32 text-center">
+            <Ring2
+              size="40"
+              stroke="5"
+              strokeLength="0.25"
+              bgOpacity="0.1"
+              speed="0.8"
+              color="blue"
+            />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-y-6">
+            {courses?.arrayCourse?.length == 0 ? (
+              <div className="flex flex-col items-center gap-y-2 text-title-sm text-nav-muted mt-6">
+                <LuInbox className="text-display-md text-gray-300" />
+                <p>Chưa có khóa học nào</p>
+              </div>
+            ) : (
+              <>
+                <div className="hidden xl:block w-full">
+                  <table className="w-full border-separate border-spacing-0 overflow-hidden border border-surface-bg rounded-[16px] mt-6">
+                    <thead>
+                      <tr className="flex items-center justify-between text-surface-nav font-medium">
+                        <td className="w-[35%] p-2">Khóa học</td>
+                        <td className="w-[20%]">Giảng viên</td>
+                        <td className="w-[16%]">Học viên</td>
+                        <td className="w-[9%]">Trạng thái</td>
+                        <td className="w-[20%] p-2 text-right">Thao tác</td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {courses?.arrayCourse?.length > 0 ? (
+                        courses?.arrayCourse?.map((value) => {
+                          return (
+                            <tr
+                              className="flex justify-between items-center border-t border-surface-bg hover:bg-surface-bg"
+                              key={value?.course._id}
+                            >
+                              <td className="flex items-center gap-x-2 w-[35%] p-2">
+                                <img
+                                  src={value?.course.image_url}
+                                  width={50}
+                                  height={50}
+                                  className="rounded-[8px] object-cover"
+                                  alt=""
+                                />
+                                <div>
+                                  <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
+                                    {value?.course.course_name}
+                                  </p>
+                                  <p className="text-nav-muted text-body-lg">
+                                    {value?.course.category_id.category_name}
+                                  </p>
+                                </div>
+                              </td>
+                              <td className="w-[20%] text-title-sm text-surface-nav font-medium wrap-break-word">
+                                {value?.course.user_id.full_name}
+                              </td>
+                              <td className="flex gap-x-1 items-center w-[15%] text-title-sm text-surface-nav">
+                                <RxPeople />
+                                <p>{value.numberEnrollment}</p>
+                              </td>
+                              <td className="w-[10%]">
+                                <p
+                                  className={`text-body-md text-center font-medium rounded-[8px] py-1 ${
+                                    value?.course.status === "pending"
+                                      ? "text-yellow-700 bg-yellow-100"
+                                      : value?.course.status === "approved"
+                                      ? "text-green-700 bg-green-100"
+                                      : "text-red-700 bg-red-100"
+                                  }`}
+                                >
+                                  {value?.course.status}
+                                </p>
+                              </td>
+                              <td className="flex justify-end gap-x-2 items-center w-[20%] pe-2">
+                                {value?.course.status === "pending" && (
+                                  <div className="flex items-center gap-x-2">
+                                    <button
+                                      onClick={() => {
+                                        const courseId = value?.course?._id;
+                                        const item = courses?.arrayCourse?.find(
+                                          (v) => v?.course?._id === courseId
+                                        );
+                                        setIsApproved(true);
+                                        setCourse(item?.course);
+                                        setMessage(
+                                          "Bạn có muốn duyệt khóa học này không ?"
+                                        );
+                                        confirmDialog?.current?.showModal();
+                                      }}
+                                      className="px-2 py-1 bg-green-700 text-body-lg text-surface-white rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                                    >
+                                      Duyệt
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        const courseId = value?.course?._id;
+                                        const item = courses?.arrayCourse?.find(
+                                          (v) => v?.course?._id === courseId
+                                        );
+                                        setIsApproved(false);
+                                        setIsRejected(true);
+                                        setCourse(item?.course);
+                                        setMessage(
+                                          "Bạn có muốn từ chối khóa học này không ?"
+                                        );
+                                        confirmDialog?.current?.showModal();
+                                      }}
+                                      className="px-2 py-1 bg-brand-primary text-body-lg text-surface-white rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                                    >
+                                      Từ chối
+                                    </button>
+                                  </div>
+                                )}
+                                <IoEyeOutline
+                                  className="hover:cursor-pointer text-title-lg"
+                                  onClick={() =>
+                                    navigate(`/course/${value?.course._id}`)
+                                  }
+                                />
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={5}
+                            className="text-center py-6 text-nav-muted"
                           >
-                            <td className="flex items-center gap-x-2 w-[35%] p-2">
+                            Chưa có khóa học nào
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex flex-col gap-4 mt-6 xl:hidden w-full">
+                  {courses?.arrayCourse?.length > 0 ? (
+                    courses?.arrayCourse?.map((value) => {
+                      return (
+                        <div
+                          key={value?.course._id}
+                          className="flex flex-col gap-y-3 p-4 border border-surface-bg rounded-[16px] bg-surface-white shadow-sm"
+                        >
+                          <div className="flex flex-col gap-y-2 md:flex-row md:items-start md:justify-between">
+                            <div className="flex gap-x-3 items-center">
                               <img
                                 src={value?.course.image_url}
-                                width={50}
-                                height={50}
-                                className="rounded-[8px] object-cover"
+                                className="w-[80px] h-[80px] rounded-[8px] object-contain shrink-0"
                                 alt=""
                               />
                               <div>
@@ -211,203 +328,97 @@ const AdminCourses = () => {
                                   {value?.course.category_id.category_name}
                                 </p>
                               </div>
-                            </td>
-                            <td className="w-[20%] text-title-sm text-surface-nav font-medium wrap-break-word">
-                              {value?.course.user_id.full_name}
-                            </td>
-                            <td className="flex gap-x-1 items-center w-[15%] text-title-sm text-surface-nav">
-                              <RxPeople />
-                              <p>{value.numberEnrollment}</p>
-                            </td>
-                            <td className="w-[10%]">
-                              <p
-                                className={`text-body-md text-center font-medium rounded-[8px] py-1 ${
-                                  value?.course.status === "pending"
-                                    ? "text-yellow-700 bg-yellow-100"
-                                    : value?.course.status === "approved"
-                                    ? "text-green-700 bg-green-100"
-                                    : "text-red-700 bg-red-100"
-                                }`}
-                              >
-                                {value?.course.status}
-                              </p>
-                            </td>
-                            <td className="flex justify-end gap-x-2 items-center w-[20%] pe-2">
-                              {value?.course.status === "pending" && (
-                                <div className="flex items-center gap-x-2">
-                                  <button
-                                    onClick={() => {
-                                      const courseId = value?.course?._id;
-                                      const item = courses?.arrayCourse?.find(
-                                        (v) => v?.course?._id === courseId
-                                      );
-                                      setIsApproved(true);
-                                      setCourse(item?.course);
-                                      setMessage(
-                                        "Bạn có muốn duyệt khóa học này không ?"
-                                      );
-                                      confirmDialog?.current?.showModal();
-                                    }}
-                                    className="px-2 py-1 bg-green-700 text-body-lg text-surface-white rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
-                                  >
-                                    Duyệt
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      const courseId = value?.course?._id;
-                                      const item = courses?.arrayCourse?.find(
-                                        (v) => v?.course?._id === courseId
-                                      );
-                                      setIsApproved(false);
-                                      setIsRejected(true);
-                                      setCourse(item?.course);
-                                      setMessage(
-                                        "Bạn có muốn từ chối khóa học này không ?"
-                                      );
-                                      confirmDialog?.current?.showModal();
-                                    }}
-                                    className="px-2 py-1 bg-brand-primary text-body-lg text-surface-white rounded-[8px] transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
-                                  >
-                                    Từ chối
-                                  </button>
-                                </div>
-                              )}
-                              <IoEyeOutline
-                                className="hover:cursor-pointer text-title-lg"
-                                onClick={() =>
-                                  navigate(`/course/${value?.course._id}`)
-                                }
-                              />
-                            </td>
-                          </tr>
-                        );
-                      })
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={5}
-                          className="text-center py-6 text-nav-muted"
-                        >
-                          Chưa có khóa học nào
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              <div className="flex flex-col gap-4 mt-6 xl:hidden w-full">
-                {courses?.arrayCourse?.length > 0 ? (
-                  courses?.arrayCourse?.map((value) => {
-                    return (
-                      <div
-                        key={value?.course._id}
-                        className="flex flex-col gap-y-3 p-4 border border-surface-bg rounded-[16px] bg-surface-white shadow-sm"
-                      >
-                        <div className="flex flex-col gap-y-2 md:flex-row md:items-start md:justify-between">
-                          <div className="flex gap-x-3 items-center">
-                            <img
-                              src={value?.course.image_url}
-                              className="w-[80px] h-[80px] rounded-[8px] object-contain shrink-0"
-                              alt=""
-                            />
-                            <div>
-                              <p className="text-surface-nav text-title-lg font-medium wrap-break-word">
-                                {value?.course.course_name}
-                              </p>
-                              <p className="text-nav-muted text-body-lg">
-                                {value?.course.category_id.category_name}
-                              </p>
                             </div>
-                          </div>
-                          <span
-                            className={`text-center text-body-sm font-medium rounded-[8px] px-2 py-1 shrink-0 ${
-                              value?.course.status === "pending"
-                                ? "text-yellow-700 bg-yellow-100"
-                                : value?.course.status === "approved"
-                                ? "text-green-700 bg-green-100"
-                                : "text-red-700 bg-red-100"
-                            }`}
-                          >
-                            {value?.course.status}
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-y-1 md:flex-row md:justify-between text-title-sm text-surface-nav pt-2 border-t border-surface-bg">
-                          <p className="font-medium">
-                            Giang viên:{" "}
-                            <span className="text-nav-muted wrap-break-word">
-                              {value?.course.user_id.full_name}
+                            <span
+                              className={`text-center text-body-sm font-medium rounded-[8px] px-2 py-1 shrink-0 ${
+                                value?.course.status === "pending"
+                                  ? "text-yellow-700 bg-yellow-100"
+                                  : value?.course.status === "approved"
+                                  ? "text-green-700 bg-green-100"
+                                  : "text-red-700 bg-red-100"
+                              }`}
+                            >
+                              {value?.course.status}
                             </span>
-                          </p>
-                          <div className="flex gap-x-1 items-center">
-                            <RxPeople />
-                            <p>{value.numberEnrollment} học viên</p>
                           </div>
-                        </div>
-                        <div className="flex flex-col gap-y-2 md:flex-row md:justify-between pt-2 border-t border-surface-bg">
-                          <div
-                            onClick={() =>
-                              navigate(`/course/${value?.course._id}`)
-                            }
-                            className="flex gap-x-1 items-center text-body-lg text-brand-blue hover:cursor-pointer font-medium"
-                          >
-                            <IoEyeOutline />
-                            <span>Xem chi tiết</span>
-                          </div>
-                          {value?.course.status === "pending" && (
-                            <div className="flex gap-x-2 font-medium">
-                              <button
-                                onClick={() => {
-                                  const courseId = value?.course?._id;
-                                  const item = courses?.arrayCourse?.find(
-                                    (v) => v?.course?._id === courseId
-                                  );
-                                  setIsApproved(true);
-                                  setCourse(item?.course);
-                                  setMessage(
-                                    "Bạn có muốn duyệt khóa học này không ?"
-                                  );
-                                  confirmDialog?.current?.showModal();
-                                }}
-                                className="px-3 py-1 bg-green-700 text-body-lg text-surface-white rounded-[8px] hover:cursor-pointer"
-                              >
-                                Duyệt
-                              </button>
-                              <button
-                                onClick={() => {
-                                  const courseId = value?.course?._id;
-                                  const item = courses?.arrayCourse?.find(
-                                    (v) => v?.course?._id === courseId
-                                  );
-                                  setIsApproved(false);
-                                  setIsRejected(true);
-                                  setCourse(item?.course);
-                                  setMessage(
-                                    "Bạn có muốn từ chối khóa học này không ?"
-                                  );
-                                  confirmDialog?.current?.showModal();
-                                }}
-                                className="px-3 py-1 bg-brand-primary text-body-lg text-surface-white rounded-[8px] hover:cursor-pointer"
-                              >
-                                Từ chối
-                              </button>
+                          <div className="flex flex-col gap-y-1 md:flex-row md:justify-between text-title-sm text-surface-nav pt-2 border-t border-surface-bg">
+                            <p className="font-medium">
+                              Giang viên:{" "}
+                              <span className="text-nav-muted wrap-break-word">
+                                {value?.course.user_id.full_name}
+                              </span>
+                            </p>
+                            <div className="flex gap-x-1 items-center">
+                              <RxPeople />
+                              <p>{value.numberEnrollment} học viên</p>
                             </div>
-                          )}
+                          </div>
+                          <div className="flex flex-col gap-y-2 md:flex-row md:justify-between pt-2 border-t border-surface-bg">
+                            <div
+                              onClick={() =>
+                                navigate(`/course/${value?.course._id}`)
+                              }
+                              className="flex gap-x-1 items-center text-body-lg text-brand-blue hover:cursor-pointer font-medium"
+                            >
+                              <IoEyeOutline />
+                              <span>Xem chi tiết</span>
+                            </div>
+                            {value?.course.status === "pending" && (
+                              <div className="flex gap-x-2 font-medium">
+                                <button
+                                  onClick={() => {
+                                    const courseId = value?.course?._id;
+                                    const item = courses?.arrayCourse?.find(
+                                      (v) => v?.course?._id === courseId
+                                    );
+                                    setIsApproved(true);
+                                    setCourse(item?.course);
+                                    setMessage(
+                                      "Bạn có muốn duyệt khóa học này không ?"
+                                    );
+                                    confirmDialog?.current?.showModal();
+                                  }}
+                                  className="px-3 py-1 bg-green-700 text-body-lg text-surface-white rounded-[8px] hover:cursor-pointer"
+                                >
+                                  Duyệt
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    const courseId = value?.course?._id;
+                                    const item = courses?.arrayCourse?.find(
+                                      (v) => v?.course?._id === courseId
+                                    );
+                                    setIsApproved(false);
+                                    setIsRejected(true);
+                                    setCourse(item?.course);
+                                    setMessage(
+                                      "Bạn có muốn từ chối khóa học này không ?"
+                                    );
+                                    confirmDialog?.current?.showModal();
+                                  }}
+                                  className="px-3 py-1 bg-brand-primary text-body-lg text-surface-white rounded-[8px] hover:cursor-pointer"
+                                >
+                                  Từ chối
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="text-center py-6 text-nav-muted border border-surface-bg rounded-[16px]">
-                    Chưa có khóa học nào
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-          {courses?.totalPages > 1 && (
-            <PaginationButton totalPages={courses?.totalPages} />
-          )}
-        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-6 text-nav-muted border border-surface-bg rounded-[16px]">
+                      Chưa có khóa học nào
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+            {courses?.totalPages > 1 && (
+              <PaginationButton totalPages={courses?.totalPages} />
+            )}
+          </div>
+        )}
       </div>
       <ConfirmDialog
         ref={confirmDialog}
