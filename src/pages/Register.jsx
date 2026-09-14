@@ -214,7 +214,7 @@ const Register = () => {
               value={isLoading ? "Đang xử lý..." : "Đăng ký"}
             />
           </form>
-          <div className="flex justify-center mt-4 lg:mt-10 mx-auto">
+          <div className="flex justify-center mt-4 lg:mt-8 mx-auto">
             <p className="text-body-lg text-nav-muted">Đã có tài khoản?</p>
             <Link
               className="text-body-lg font-medium text-brand-blue ms-2 hover:underline"
