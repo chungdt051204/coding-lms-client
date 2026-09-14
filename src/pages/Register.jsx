@@ -164,7 +164,7 @@ const Register = () => {
                 Bạn muốn đăng ký với vai trò
               </label>
               {roles?.length == 0 ? (
-                <div className="pt-8 text-center">
+                <div className="py-4 text-center">
                   <Ring2
                     size="40"
                     stroke="5"
@@ -214,7 +214,7 @@ const Register = () => {
               value={isLoading ? "Đang xử lý..." : "Đăng ký"}
             />
           </form>
-          <div className="flex justify-center mt-4 mx-auto">
+          <div className="flex justify-center mt-4 lg:mt-10 mx-auto">
             <p className="text-body-lg text-nav-muted">Đã có tài khoản?</p>
             <Link
               className="text-body-lg font-medium text-brand-blue ms-2 hover:underline"
