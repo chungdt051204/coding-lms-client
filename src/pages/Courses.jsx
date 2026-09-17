@@ -186,7 +186,14 @@ const Courses = () => {
               Hiển thị {courses?.arrayCourse?.length || 0} khóa học
             </p>
             <Select
-              onChange={setOption}
+              onChange={(selected) => {
+                setOption(selected);
+                setSearchParams((prev) => {
+                  const newParams = new URLSearchParams(prev);
+                  if (newParams.has("page")) newParams.delete("page");
+                  return newParams;
+                });
+              }}
               defaultValue={options[0]}
               className="w-full sm:w-[40%] md:w-[30%] lg:w-[25%] text-title-sm text-nav-muted font-medium"
               options={options}
