@@ -15,7 +15,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 
 const Instructors = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [instructors, setInstructors] = useState([]);
   const [instructor, setInstructor] = useState(null);
   const [refresh, setRefresh] = useState(0);
@@ -159,6 +159,7 @@ const Instructors = () => {
                 onClick={() => {
                   setIdx(index);
                   setStatus(value.status);
+                  setSearchParams("");
                 }}
                 key={index}
               >

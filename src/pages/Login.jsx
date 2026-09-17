@@ -18,6 +18,7 @@ const Login = () => {
   const [error, setError] = useState({ errorEmail: "", errorPassword: "" });
   const [errorLogin, setErrorLogin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     const data = { email: formData.email, password: formData.password };

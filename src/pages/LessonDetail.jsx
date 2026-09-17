@@ -9,6 +9,7 @@ import ReactPlayer from "react-player";
 import { toast } from "react-toastify";
 import { Ring2 } from "ldrs/react";
 import "ldrs/react/Ring2.css";
+import { PiWarningCircle } from "react-icons/pi";
 import { IoPlayCircleOutline } from "react-icons/io5";
 import { IoIosLock } from "react-icons/io";
 import { FaCheck } from "react-icons/fa6";
@@ -30,7 +31,7 @@ const LessonDetail = () => {
   const [lessons, setLessons] = useState([]);
   const [lesson, setLesson] = useState(null);
   const [lessonProgresses, setLessonProgresses] = useState([]);
-  const currentTime = Number(
+  let currentTime = Number(
     lessonProgresses.find((value) => value.lesson_id._id == id)?.current_time
   );
   const enrolledCourse = enrollments?.arrayEnrollment?.find(
@@ -42,7 +43,9 @@ const LessonDetail = () => {
       : enrolledCourse?.item?.access_level == "UNLIMITED"
       ? lessons?.length
       : 0;
+  const [onPlaying, setOnPlaying] = useState(false);
   const playerRef = useRef();
+  const dialogRef = useRef();
   useEffect(() => {
     if (!sessionStorage.getItem("token")) {
       navigate("/");
@@ -140,7 +143,8 @@ const LessonDetail = () => {
     }
   }, [courseId, id, lessonProgresses, lessons, navigate, numberAccessLesson]);
   const createLessonProgress = async () => {
-    if (!loading && !isAdmin && !isInstructor) {
+    if (!loading && !isAdmin && !isInstructor && !onPlaying) {
+      playerRef.current.currentTime = currentTime;
       if (!lessonProgresses?.some((value) => value.lesson_id._id == id)) {
         try {
           const result = await lessonProgressService.createLessonProgress({
@@ -154,6 +158,9 @@ const LessonDetail = () => {
           const message = error.data.message;
           console.log(status, message);
         }
+      } else {
+        setOnPlaying(false);
+        dialogRef?.current?.showModal();
       }
     }
   };
@@ -198,13 +205,66 @@ const LessonDetail = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-y-6 lg:flex-row py-24">
-          <div className="flex flex-col gap-y-2 w-full lg:w-[60%]">
+          <div className="flex flex-col gap-y-2 w-full lg:w-[60%] relative">
+            <dialog
+              ref={dialogRef}
+              className="absolute w-[90%] md:w-[75%] lg:w-[45%] top-[200px] md:top-[220px] left-[20px] md:left-[100px] p-4 rounded-[8px] shadow-lg"
+            >
+              <div className="flex flex-col gap-y-4 ">
+                <div className="flex flex-col items-center">
+                  <PiWarningCircle className="text-display-lg text-yellow-300" />
+                  <p className="text-title-sm text-surface-nav">
+                    Hệ thống ghi nhận bạn đã xem được{" "}
+                    {format.formatSecondToTime({ second: currentTime })}. Bạn có
+                    muốn xem tiếp ko?
+                  </p>
+                </div>
+                <hr className="text-gray-300" />
+                <div className="flex justify-end">
+                  <div className="flex gap-x-4 text-title-sm">
+                    <button
+                      className="px-6 py-2 border border-gray-300 rounded-[8px] transition-transform duration-300 hover:cursor-pointer"
+                      onClick={() => {
+                        setOnPlaying(true);
+                        dialogRef?.current?.close();
+                      }}
+                    >
+                      Xem tiếp
+                    </button>
+                    <button
+                      className="px-6 py-2 bg-blue-600 rounded-[8px] text-surface-white transition-transform duration-300 hover:text-surface-bg hover:cursor-pointer"
+                      onClick={async () => {
+                        try {
+                          const result =
+                            await lessonProgressService.updateLessonProgress({
+                              lessonId: id,
+                              currentTime: 0,
+                            });
+                          const newLessonProgresses = [...lessonProgresses];
+                          const index = newLessonProgresses.findIndex(
+                            (value) => value.lesson_id._id == id
+                          );
+                          newLessonProgresses[index] = result.data;
+                          setLessonProgresses(newLessonProgresses);
+                          playerRef.current.currentTime = 0;
+                          setOnPlaying(true);
+                          dialogRef?.current?.close();
+                        } catch (error) {
+                          const status = error.status;
+                          const message = error.data.message;
+                          console.log(status, message);
+                        }
+                      }}
+                    >
+                      Xem từ đầu
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </dialog>
             <div className="h-[350px] md:h-[450px] bg-surface-nav py-8 px:0 md:px-10">
               <ReactPlayer
-                onStart={() => {
-                  if (!isAdmin && !isInstructor)
-                    playerRef.current.currentTime = currentTime;
-                }}
+                playing={onPlaying}
                 onPlay={createLessonProgress}
                 onProgress={updateLessonProgress}
                 ref={playerRef}

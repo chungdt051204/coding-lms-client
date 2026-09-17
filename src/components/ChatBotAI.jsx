@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { aiService } from "../services/aiService";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { FiSend } from "react-icons/fi";
@@ -21,12 +21,14 @@ const ChatBotAI = () => {
   const [isClicked, setIsClicked] = useState(false);
   const [isDropdown, setIsDropdown] = useState(true);
   const [input, setInput] = useState("");
+  const inputRef = useRef();
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSended, setIsSended] = useState(false);
   const [idx, setIdx] = useState(0);
   const handleSendMessage = async () => {
     if (!input.trim()) return;
+    setInput("");
     setIdx(2);
     setIsLoading(true);
     setIsSended(true);
@@ -35,7 +37,9 @@ const ChatBotAI = () => {
       { message: input, type: "text", sender: "user" },
     ]);
     try {
-      const result = await aiService.sendMessage({ input });
+      const result = await aiService.sendMessage({
+        input: inputRef?.current?.value,
+      });
       setIdx(3);
       console.log(result);
       console.log(result.data);
@@ -80,8 +84,6 @@ const ChatBotAI = () => {
         default:
           break;
       }
-      setIsSended(false);
-      setInput("");
       setTimeout(() => {
         setIdx(4);
         setTimeout(() => {
@@ -93,6 +95,7 @@ const ChatBotAI = () => {
       const message = error.data.message;
       console.log(status, message);
     } finally {
+      setIsSended(false);
       setIsLoading(false);
     }
   };
@@ -198,13 +201,15 @@ const ChatBotAI = () => {
                                   </div>
                                 )}
                                 <div
-                                  className={`py-2 px-4 ${
+                                  className={`py-2 px-4 min-w-0 ${
                                     value.sender == "user"
                                       ? "bg-blue-500 text-surface-white"
                                       : "bg-surface-white text-surface-nav"
                                   } rounded-[16px] text-body-md shadow-md`}
                                 >
-                                  {value.message}
+                                  <p className="wrap-break-word">
+                                    {value.message}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -375,12 +380,18 @@ const ChatBotAI = () => {
               </div>
               <div className="bg-surface-white h-[60px] rounded-b-[16px] border-t-gray-100 px-4 py-2">
                 <div className="flex gap-x-4 items-center">
-                  <input
+                  <textarea
+                    rows={1}
                     value={input}
+                    ref={inputRef}
                     onChange={(e) => {
                       setInput(e.target.value);
                       setIdx(1);
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSendMessage();
+                    }}
+                    disabled={isSended}
                     className="px-4 py-2 text-title-sm text-surface-nav rounded-[16px] w-[80%] border border-gray-200 bg-gray-50 outline-none"
                     type="text"
                     placeholder="Nhập câu hỏi..."

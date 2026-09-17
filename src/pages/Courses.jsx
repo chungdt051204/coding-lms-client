@@ -73,6 +73,7 @@ const Courses = () => {
   const [option, setOption] = useState("");
   const [level, setLevel] = useState("");
   const [error, setError] = useState("");
+
   useEffect(() => {
     const getApprovedCourses = async () => {
       try {
@@ -95,6 +96,18 @@ const Courses = () => {
     };
     getApprovedCourses();
   }, [dispatch, searchParams, page, category, level, option]);
+  const handleSearch = () => {
+    if (!searchValue?.trim()) {
+      setError("Vui lòng nhập từ khóa tìm kiếm!");
+      return;
+    }
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      if (searchValue) newParams.set("search", searchValue);
+      else newParams.delete("search");
+      return newParams;
+    });
+  };
   return (
     <>
       <Navbar />
@@ -113,18 +126,7 @@ const Courses = () => {
           <div className="relative w-full lg:w-[55%]">
             <div className="flex gap-x-2 items-center py-2 px-4 bg-surface-bg rounded-[8px]">
               <IoSearch
-                onClick={() => {
-                  if (!searchValue?.trim()) {
-                    setError("Vui lòng nhập từ khóa tìm kiếm!");
-                    return;
-                  }
-                  setSearchParams((prev) => {
-                    const newParams = new URLSearchParams(prev);
-                    if (searchValue) newParams.set("search", searchValue);
-                    else newParams.delete("search");
-                    return newParams;
-                  });
-                }}
+                onClick={handleSearch}
                 className="text-title-lg sm:text-headline-sm text-nav-muted font-medium hover:cursor-pointer shrink-0"
               />
               <input
@@ -135,6 +137,9 @@ const Courses = () => {
                 onChange={(e) => {
                   setSearchValue(e.target.value);
                   setError("");
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
                 }}
               />
             </div>
@@ -147,13 +152,27 @@ const Courses = () => {
           {/* Filter Dropdowns */}
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full lg:w-[45%]">
             <Select
-              onChange={setCategory}
+              onChange={(selected) => {
+                setCategory(selected);
+                setSearchParams((prev) => {
+                  const newParams = new URLSearchParams(prev);
+                  if (newParams.has("page")) newParams.delete("page");
+                  return newParams;
+                });
+              }}
               defaultValue={categoryOptions[0]}
               className="w-full lg:w-[65%] text-title-sm text-nav-muted font-medium"
               options={categoryOptions}
             />
             <Select
-              onChange={setLevel}
+              onChange={(selected) => {
+                setLevel(selected);
+                setSearchParams((prev) => {
+                  const newParams = new URLSearchParams(prev);
+                  if (newParams.has("page")) newParams.delete("page");
+                  return newParams;
+                });
+              }}
               defaultValue={levels[0]}
               className="w-full lg:w-[65%] text-title-sm text-nav-muted font-medium"
               options={levels}

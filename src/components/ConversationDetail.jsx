@@ -185,32 +185,67 @@ const ConversationDetail = ({
                   {messages?.map((value) => {
                     return (
                       <div
-                        key={value._id}
-                        className={`flex ${
+                        key={value?._id}
+                        className={`flex justify-end ${
                           (currentRole == "user" &&
-                            getRole({ roleId: value?.sender_id?.role_id }) ==
-                              "user") ||
+                            getRole({
+                              roleId: value?.sender_id?.role_id,
+                            }) == "user") ||
                           (currentRole == "instructor" &&
-                            getRole({ roleId: value?.sender_id?.role_id }) ==
-                              "instructor")
+                            getRole({
+                              roleId: value?.sender_id?.role_id,
+                            }) == "instructor")
                             ? "justify-end"
                             : "justify-start"
                         }`}
                       >
-                        <p
-                          className={`${
+                        <div
+                          className={`flex w-[75%] gap-x-2 items-start ${
                             (currentRole == "user" &&
-                              getRole({ roleId: value?.sender_id?.role_id }) ==
-                                "user") ||
+                              getRole({
+                                roleId: value?.sender_id?.role_id,
+                              }) == "user") ||
                             (currentRole == "instructor" &&
-                              getRole({ roleId: value?.sender_id?.role_id }) ==
-                                "instructor")
-                              ? "bg-auth text-surface-white"
-                              : "bg-surface-white text-surface-nav"
-                          } text-body-sm rounded-[16px] shadow-sm py-2 px-4 w-fit`}
+                              getRole({
+                                roleId: value?.sender_id?.role_id,
+                              }) == "instructor")
+                              ? "justify-end"
+                              : "justify-start"
+                          }`}
                         >
-                          {value.message}
-                        </p>
+                          {((currentRole == "user" &&
+                            getRole({
+                              roleId: value?.sender_id?.role_id,
+                            }) == "instructor") ||
+                            (currentRole == "instructor" &&
+                              getRole({
+                                roleId: value?.sender_id?.role_id,
+                              }) == "user")) && (
+                            <img
+                              src={conversationInfo?.userAvatar}
+                              alt=""
+                              className="w-[30px] h-[30px] rounded-[1000px] object-cover"
+                            />
+                          )}
+                          <div className="min-w-0">
+                            <p
+                              className={`${
+                                (currentRole == "user" &&
+                                  getRole({
+                                    roleId: value?.sender_id?.role_id,
+                                  }) == "user") ||
+                                (currentRole == "instructor" &&
+                                  getRole({
+                                    roleId: value?.sender_id?.role_id,
+                                  }) == "instructor")
+                                  ? "bg-auth text-surface-white"
+                                  : "bg-surface-white text-surface-nav"
+                              } text-body-sm rounded-[16px] shadow-sm py-2 px-4 wrap-break-word`}
+                            >
+                              {value.message}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
@@ -218,8 +253,12 @@ const ConversationDetail = ({
               </div>
               <div className="bg-surface-white h-[60px] rounded-b-[16px] border-t-gray-100 px-4 py-2">
                 <div className="flex gap-x-4 items-center">
-                  <input
+                  <textarea
+                    rows={1}
                     onChange={(e) => setChatMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSendMessage();
+                    }}
                     value={chatMessage}
                     className="px-4 py-2 text-title-sm text-surface-nav rounded-[16px] w-[80%] border border-gray-200 bg-gray-50 outline-none"
                     type="text"

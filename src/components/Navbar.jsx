@@ -180,6 +180,12 @@ export const Navbar = () => {
                   className="w-full outline-0 bg-transparent text-body-md truncate"
                   placeholder="Tìm khóa học, danh mục, giảng viên..."
                   onChange={(e) => setSearchValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter")
+                      navigate(
+                        `/courses?search=${encodeURIComponent(searchValue)}`
+                      );
+                  }}
                 />
               </div>
               {searchValue && (

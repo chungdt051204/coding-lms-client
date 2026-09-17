@@ -24,7 +24,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 
 const InstructorCourses = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [myCourses, setMyCourses] = useState([]);
   const [course, setCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -177,6 +177,7 @@ const InstructorCourses = () => {
                 onClick={() => {
                   setIdx(index);
                   setStatus(value.status);
+                  setSearchParams("");
                 }}
                 key={index}
               >

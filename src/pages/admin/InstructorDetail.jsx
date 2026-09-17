@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { userService } from "../../services/userService";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { format } from "../../../helper/format";
 import { toast } from "react-toastify";
 import { Ring2 } from "ldrs/react";
@@ -22,10 +22,13 @@ import { FaGraduationCap } from "react-icons/fa";
 import { FiDollarSign } from "react-icons/fi";
 import { IoBan } from "react-icons/io5";
 import image from "../../assets/default_image.png";
+import PaginationButton from "../../components/PaginationButton";
 
 const InstructorDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = searchParams.get("page") || 1;
   const [isLoading, setIsLoading] = useState(true);
   const [instructor, setInstructor] = useState(null);
   const [instructorInfo, setInstructorInfo] = useState({
@@ -47,38 +50,26 @@ const InstructorDetail = () => {
       status: "",
       title: "Tất cả khóa học",
       icon: <IoListOutline />,
-      numberCourse: courses?.filter((value) => value?.item?.is_visible)?.length,
     },
     {
       status: "draft",
       title: "Bản nháp",
       icon: <RiDraftLine />,
-      numberCourse: courses?.filter(
-        (value) => value?.item?.is_visible && value?.item?.status == "draft"
-      )?.length,
     },
     {
       status: "pending",
       title: "Đang chờ duyệt",
       icon: <GoClock />,
-      numberCourse: courses?.filter(
-        (value) => value?.item?.is_visible && value?.item?.status == "pending"
-      )?.length,
     },
     {
       status: "approved",
       title: "Đã đăng tải",
       icon: <CiCircleCheck />,
-      numberCourse: courses?.filter(
-        (value) => value?.item?.is_visible && value?.item?.status == "approved"
-      )?.length,
     },
     {
       status: "deleted",
       title: "Đã xóa",
       icon: <RiDeleteBinLine />,
-      numberCourse: courses?.filter((value) => !value?.item?.is_visible)
-        ?.length,
     },
   ];
   const [idx, setIdx] = useState(0);
@@ -91,8 +82,13 @@ const InstructorDetail = () => {
   useEffect(() => {
     const getInstructorById = async () => {
       try {
+        const params = new URLSearchParams();
+        params.append("page", page);
+        params.append("limit", 5);
+        params.append("status", currentStatus);
         const result = await userService.getInstructorById({
           instructorId: id,
+          params,
         });
         console.log(result.data);
         setInstructor(result.data);
@@ -117,7 +113,7 @@ const InstructorDetail = () => {
       }
     };
     getInstructorById();
-  }, [id]);
+  }, [id, page, currentStatus]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = {
@@ -501,7 +497,10 @@ const InstructorDetail = () => {
                       className={`flex justify-center sm:justify-start py-4 shrink-0 sm:w-auto hover:cursor-pointer ${
                         idx == index && borderBottomColors[index]
                       }`}
-                      onClick={() => setIdx(index)}
+                      onClick={() => {
+                        setIdx(index);
+                        setSearchParams("");
+                      }}
                       key={index}
                     >
                       <div
@@ -511,7 +510,6 @@ const InstructorDetail = () => {
                       >
                         {value.icon}
                         <p>{value.title}</p>
-                        <p>({value.numberCourse})</p>
                       </div>
                     </div>
                   );
@@ -690,6 +688,11 @@ const InstructorDetail = () => {
               )}
             </div>
           )}
+          <div className="mt-5">
+            {instructor?.totalPages > 1 && (
+              <PaginationButton totalPages={instructor?.totalPages} />
+            )}
+          </div>
         </div>
       )}
     </>

@@ -12,7 +12,7 @@ import PaginationButton from "../../components/PaginationButton";
 import ConfirmDialog from "../../components/ConfirmDialog";
 
 const Comments = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState(null);
   const [refresh, setRefresh] = useState(0);
@@ -106,6 +106,7 @@ const Comments = () => {
                 onClick={() => {
                   setIdx(index);
                   setStatus(value.status);
+                  setSearchParams("");
                 }}
                 key={index}
               >

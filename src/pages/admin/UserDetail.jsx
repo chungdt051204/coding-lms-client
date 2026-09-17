@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { userService } from "../../services/userService";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { format } from "../../../helper/format";
 import { Ring2 } from "ldrs/react";
 import "ldrs/react/Ring2.css";
@@ -10,9 +10,12 @@ import { IoBan } from "react-icons/io5";
 import { IoBookOutline } from "react-icons/io5";
 import { BsCreditCard } from "react-icons/bs";
 import { LuInbox } from "react-icons/lu";
+import PaginationButton from "../../components/PaginationButton";
 
 const UserDetail = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const page = searchParams.get("page") || 1;
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const courses = user?.arrayCourse;
@@ -20,8 +23,12 @@ const UserDetail = () => {
   useEffect(() => {
     const getInstructorById = async () => {
       try {
+        const params = new URLSearchParams();
+        params.append("page", page);
+        params.append("limit", 5);
         const result = await userService.getUserById({
           userId: id,
+          params,
         });
         console.log(result.data);
         setUser(result.data);
@@ -34,7 +41,7 @@ const UserDetail = () => {
       }
     };
     getInstructorById();
-  }, [id]);
+  }, [id, page]);
 
   return (
     <>
@@ -339,6 +346,11 @@ const UserDetail = () => {
               </div>
             </>
           )}
+          <div className="mt-5">
+            {user?.totalPages > 1 && (
+              <PaginationButton totalPages={user?.totalPages} />
+            )}
+          </div>
         </div>
       )}
     </>

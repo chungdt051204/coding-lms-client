@@ -15,7 +15,7 @@ import PaginationButton from "../../components/PaginationButton";
 
 const Orders = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const filterTabs = [
@@ -103,6 +103,7 @@ const Orders = () => {
                 onClick={() => {
                   setIdx(index);
                   setStatus(value.status);
+                  setSearchParams("");
                 }}
                 key={index}
               >

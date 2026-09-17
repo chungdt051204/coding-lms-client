@@ -17,7 +17,7 @@ import PaginationButton from "../../components/PaginationButton";
 
 const AdminCourses = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [courses, setCourses] = useState([]);
   const [course, setCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -151,6 +151,7 @@ const AdminCourses = () => {
                 onClick={() => {
                   setIdx(index);
                   setStatus(value.status);
+                  setSearchParams("");
                 }}
                 key={index}
               >

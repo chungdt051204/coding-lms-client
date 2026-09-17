@@ -14,7 +14,7 @@ const ConfirmDialog = ({ message, ref, handleClick }) => {
             </p>
           </div>
           <hr className="text-gray-300" />
-          <div className="flex flex-col items-end">
+          <div className="flex justify-end">
             <div className="flex gap-x-4 text-title-sm">
               <button
                 className="px-6 py-2 border border-gray-300 rounded-[8px] transition-transform duration-300 hover:cursor-pointer"

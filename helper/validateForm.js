@@ -47,7 +47,7 @@ export const validateForm = {
       if (!formData.email) {
         errors.errorEmail = "Email không được bỏ trống!";
         isValid = false;
-      } else if (!emailRegex.test(formData.email)) {
+      } else if (!emailRegex.test(formData.email.trim())) {
         errors.errorEmail = "Email không đúng định dạng!";
         isValid = false;
       }

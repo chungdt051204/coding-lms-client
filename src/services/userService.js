@@ -13,12 +13,14 @@ export const userService = {
     const response = await axiosClient.get(`/admin/users?${params}`);
     return response;
   },
-  getInstructorById: async ({ instructorId }) => {
-    const response = await axiosClient.get(`/admin/instructor/${instructorId}`);
+  getInstructorById: async ({ instructorId, params }) => {
+    const response = await axiosClient.get(
+      `/admin/instructor/${instructorId}?${params}`
+    );
     return response;
   },
-  getUserById: async ({ userId }) => {
-    const response = await axiosClient.get(`/admin/user/${userId}`);
+  getUserById: async ({ userId, params }) => {
+    const response = await axiosClient.get(`/admin/user/${userId}?${params}`);
     return response;
   },
   getStudentsByInstructor: async ({ params }) => {
