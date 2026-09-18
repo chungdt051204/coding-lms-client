@@ -96,7 +96,7 @@ const Courses = () => {
       }
     };
     getApprovedCourses();
-  }, [dispatch, searchParams, page, category, level, option]);
+  }, [searchParams, page, category, level, option]);
   const handleSearch = () => {
     if (!searchValue?.trim()) {
       setError("Vui lòng nhập từ khóa tìm kiếm!");
