@@ -77,6 +77,7 @@ const Courses = () => {
   useEffect(() => {
     const getApprovedCourses = async () => {
       try {
+        dispatch(setCourses([]));
         const params = new URLSearchParams(searchParams);
         params.append("limit", 6);
         if (page) params.append("page", page);
