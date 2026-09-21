@@ -59,6 +59,7 @@ function App() {
   useEffect(() => {
     socket.on("change-status", () => {
       setRefresh((prev) => prev + 1);
+      sessionStorage.removeItem("token");
       navigate("/login");
     });
   }, [navigate]);
@@ -67,6 +68,7 @@ function App() {
       console.log("Đã kết nối");
     });
     socket.on("force-logout", () => {
+      sessionStorage.removeItem("token");
       setRefresh((prev) => prev + 1);
     });
     socket.on("course-review", () => {

@@ -1,7 +1,7 @@
 import { axiosClient } from "./axiosClient";
 export const courseService = {
   addCourse: async ({ data }) => {
-    const response = await axiosClient.post("/course", data, {
+    const response = await axiosClient.post("/instructor/course", data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -25,11 +25,15 @@ export const courseService = {
     return response;
   },
   updateCourse: async ({ courseId, data }) => {
-    const response = await axiosClient.put(`/course/${courseId}`, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await axiosClient.put(
+      `/instructor/course/${courseId}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response;
   },
   deleteCourse: async ({ courseId }) => {

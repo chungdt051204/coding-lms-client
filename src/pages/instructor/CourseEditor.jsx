@@ -282,7 +282,6 @@ const CourseEditor = () => {
         if (!isValid) isAllLessonsValid = false;
       });
       setErrorLessons(newErrorLessons);
-      console.log(isAllLessonsValid);
       if (isAllLessonsValid) {
         const formData = new FormData();
         formData.append("courseName", courseInfo.courseName);
@@ -314,7 +313,6 @@ const CourseEditor = () => {
           }
         } else {
           try {
-            console.log(courseInfo.category_id);
             const result = await courseService.addCourse({ data: formData });
             toast.success(result.message || "Tạo khóa học thành công");
             navigate("/instructor/courses");
